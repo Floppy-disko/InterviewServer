@@ -1,0 +1,1 @@
+GRANT CREATE, DROP, REFERENCES, ALTER ON *.* TO 'prisma_user'@'%';
