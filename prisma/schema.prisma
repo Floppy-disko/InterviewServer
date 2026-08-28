@@ -1,0 +1,44 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model Utente {
+  id                   Int          @id @default(autoincrement())
+  email                String       @unique
+  nome                 String
+  cognome              String
+  ruolo                String       @default("esterno")
+  intervisteRicevute   Intervista[] @relation("IntervisteRicevute")
+  intervisteEffettuate Intervista[] @relation("IntervisteEffettuate")
+  selezionatoIn        Ricerca[]
+}
+
+model Intervista {
+  id             Int       @id @default(autoincrement())
+  inizio         DateTime
+  fine           DateTime
+  stato          String    @default("programmata")
+  candidatoId    Int
+  candidato      Utente    @relation("IntervisteRicevute", fields: [candidatoId], references: [id])
+  intervistatori Utente[]  @relation("IntervisteEffettuate")
+  ricerche       Ricerca[]
+}
+
+model Ricerca {
+  id          Int          @id @default(autoincrement())
+  descrizione String
+  stato       String       @default("attiva")
+  interviste  Intervista[]
+  selezionati Utente[]
+}
