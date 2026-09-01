@@ -10,6 +10,7 @@ export class PrismaService extends PrismaClient {
         user: process.env.DATABASE_USER,
         password: process.env.DATABASE_PASSWORD,
         database: process.env.DATABASE_NAME,
+        allowPublicKeyRetrieval: true // necessario per connessione a mysql, altrimenti errore "Public Key Retrieval is not allowed"
     });
     super({adapter});
   }

@@ -9,34 +9,42 @@ import { Utente } from "../generated/prisma/client"
 export class UtenteController {
   constructor(private readonly utenteService: UtenteService) {}
 
+  /**
+   * Coverti dal tipo utilizzato internatmente da prisma al dto usato dall'api
+   * @param utente dati utente strutturati da Prisma
+   * @returns dati utente utilizzati dall'api rest
+   */
+  modelToDto(utente: Utente) : CreateUtenteDto {
+    const dto : CreateUtenteDto = {
+      nome: utente.nome,
+      cognome: utente.cognome,
+      email: utente.email,
+    };
+    if (utente.ruolo != null) dto.ruolo=utente.ruolo
+    return dto;
+  }
+
   @Post()
   async create(@Body() createDto: CreateUtenteDto) : Promise<CreateUtenteDto>{
-    /* per adesso dto e prisma objects hanno la stessa struttura,
-     quindi basta passare e ritornare senza coversioni,
-     ma non vale in generale*/
-    return this.utenteService.create(createDto);
+    //converto Promise<Utente> in Promise<CreateUtenteDto>
+    const utente = this.utenteService.create(createDto);
+    const dto = utente.then(this.modelToDto);
+    return dto;
   }
 
   @Get()
   async findAll(params?: UtenteListParamsDto) : Promise<CreateUtenteDto[]>{
-    return this.utenteService.findAll(params);
+    const utente = this.utenteService.findAll(params);
+    const dto = utente.then((utenti) => utenti.map(this.modelToDto));
+    return dto;
   }
 
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number) : Promise<CreateUtenteDto | null>{
     const utente : Promise<Utente | null> = this.utenteService.findOne({id: id});
-    /*
-      converto Utente in CreateUtenteDto
-    */
     const dto : Promise<CreateUtenteDto | null> = utente.then((utente) => {
       if (utente == null) return null
-      const dto : CreateUtenteDto = {
-        nome: utente.nome,
-        cognome: utente.cognome,
-        email: utente.email,
-      };
-      if (utente.ruolo != null) dto.ruolo=utente.ruolo
-      return dto;
+      return this.modelToDto(utente);
     });
     return dto;
   }
@@ -44,21 +52,15 @@ export class UtenteController {
   @Patch(':id')
   async update(@Param('id', ParseIntPipe) id: number, @Body() updateUtenteDto: UpdateUtenteDto) : Promise<CreateUtenteDto>{
     const update = {where: {id: id}, data: updateUtenteDto};
-    return this.utenteService.update(update);
+    const utente = this.utenteService.update(update);
+    const dto = utente.then(this.modelToDto);
+    return dto;
   }
 
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number) : Promise<CreateUtenteDto> {
     const utente = this.utenteService.remove({id});
-    const dto = utente.then((utente) => {
-      const dto : CreateUtenteDto = {
-        nome: utente.nome,
-        cognome: utente.cognome,
-        email: utente.email,
-      };
-      if (utente.ruolo != null) dto.ruolo=utente.ruolo
-      return dto;
-    });
+    const dto = utente.then(this.modelToDto);
     return dto;
   }
 }
