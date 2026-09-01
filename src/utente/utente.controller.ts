@@ -23,24 +23,42 @@ export class UtenteController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: number) : Promise<CreateUtenteDto | null>{
+  async findOne(@Param('id', ParseIntPipe) id: number) : Promise<CreateUtenteDto | null>{
     const utente : Promise<Utente | null> = this.utenteService.findOne({id: id});
     /*
-      come detto prima adesso il dto di utente è compatibile con la classe usata per il modello 
-      (non uguale in questo caso), ma in generale può essere non compatibile e richiedere
-      una conversione
+      converto Utente in CreateUtenteDto
     */
-    const dto : Promise<CreateUtenteDto | null> = utente;
+    const dto : Promise<CreateUtenteDto | null> = utente.then((utente) => {
+      if (utente == null) return null
+      const dto : CreateUtenteDto = {
+        nome: utente.nome,
+        cognome: utente.cognome,
+        email: utente.email,
+      };
+      if (utente.ruolo != null) dto.ruolo=utente.ruolo
+      return dto;
+    });
     return dto;
   }
 
   @Patch(':id')
   async update(@Param('id', ParseIntPipe) id: number, @Body() updateUtenteDto: UpdateUtenteDto) : Promise<CreateUtenteDto>{
-    return this.utenteService.update(id, updateUtenteDto);
+    const update = {where: {id: id}, data: updateUtenteDto};
+    return this.utenteService.update(update);
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string) {
-    return this.utenteService.remove(+id);
+  async remove(@Param('id', ParseIntPipe) id: number) : Promise<CreateUtenteDto> {
+    const utente = this.utenteService.remove({id});
+    const dto = utente.then((utente) => {
+      const dto : CreateUtenteDto = {
+        nome: utente.nome,
+        cognome: utente.cognome,
+        email: utente.email,
+      };
+      if (utente.ruolo != null) dto.ruolo=utente.ruolo
+      return dto;
+    });
+    return dto;
   }
 }

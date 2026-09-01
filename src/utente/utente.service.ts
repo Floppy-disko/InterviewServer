@@ -7,27 +7,29 @@ export class UtenteService {
 
   constructor(private prisma: PrismaService) {}
 
-  async create(utenteCreateInput: Prisma.UtenteCreateInput): Promise<Utente> {
+  async create(data: Prisma.UtenteCreateInput): Promise<Utente> {
     return this.prisma.utente.create({
-      data: utenteCreateInput,
+      data
     });
   }
 
-  findAll(params? : Prisma.UtenteFindManyArgs) : Promise<Utente[]> {
+  async findAll(params? : Prisma.UtenteFindManyArgs) : Promise<Utente[]> {
     return this.prisma.utente.findMany(params)
   }
 
-  async findOne(utenteWhereUniqueInput: Prisma.UtenteWhereUniqueInput): Promise<Utente | null> {
+  async findOne(where: Prisma.UtenteWhereUniqueInput): Promise<Utente | null> {
     return this.prisma.utente.findUnique({
-      where: utenteWhereUniqueInput,
+      where
     });
   }
 
-  update(update: {where: Prisma.UtenteWhereUniqueInput, data: Prisma.UtenteUpdateInput}) : Promise<Utente> {
+  async update(update: {where: Prisma.UtenteWhereUniqueInput, data: Prisma.UtenteUpdateInput}) : Promise<Utente> {
     return this.prisma.utente.update(update);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} utente`;
+  async remove(where: Prisma.UtenteWhereUniqueInput): Promise<Utente> {
+    return this.prisma.utente.delete({
+      where
+    })
   }
 }
