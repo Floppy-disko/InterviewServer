@@ -77,15 +77,7 @@ export class AppController {
 
   @Post("intervista")
   async programmaIntervista(@Body() intervistaData: { ricercaId: number; candidatoId: number; intervistatoriIds: number[]; inizio: Date; fine: Date }): Promise<IntervistaModel> {
-    return this.IntervistaService.createIntervista({
-      ricerca: { connect: { id: intervistaData.ricercaId } },
-      candidato: { connect: { id: intervistaData.candidatoId } },
-      intervistatori: {
-        connect: intervistaData.intervistatoriIds.map(id => ({ id })),
-      },
-      inizio: intervistaData.inizio,
-      fine: intervistaData.fine,
-    });
+    return this.IntervistaService.createIntervista(intervistaData);
   }
 
   // Comodo per un intervista fatta a un nuovo utente che viene quindi creato al momento della programmazione dell'intervista

@@ -1,6 +1,11 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "./prisma.service.js";
 import { Intervista, Prisma } from "./generated/prisma/client.js";
+import { IsString, IsEmail, IsOptional, IsNumber, IsDate, IsArray, ArrayNotEmpty } from 'class-validator';
+
+export class IntervistaDto {
+  @IsNumber
+}
 
 @Injectable()
 export class IntervistaService {
@@ -30,6 +35,15 @@ export class IntervistaService {
   }
 
   async createIntervista(data: Prisma.IntervistaCreateInput): Promise<Intervista> {
+    {
+          ricerca: { connect: { id: data.ricerca } },
+          candidato: { connect: { id: data.candidato } },
+          intervistatori: {
+            connect: data.intervistatori.map(id => ({ id })),
+          },
+          inizio: data.inizio,
+          fine: intervistaData.fine,
+        }
     return this.prisma.intervista.create({
       data,
     });
