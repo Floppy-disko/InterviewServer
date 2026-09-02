@@ -46,7 +46,7 @@ export class UtenteController {
       if (utente == null) return null
       return this.modelToDto(utente);
     });
-    return dto;
+    return dto; 
   }
 
   @Patch(':id')
