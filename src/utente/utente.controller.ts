@@ -1,66 +1,37 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Query, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
 import { UtenteService } from './utente.service';
 import { CreateUtenteDto } from './dto/create-utente.dto';
 import { UpdateUtenteDto } from './dto/update-utente.dto';
 import { UtenteListParamsDto } from './dto/list-params.dto';
 import { Utente } from "../generated/prisma/client"
+import { ValidationPipe } from '@nestjs/common';
 
 @Controller('utente')
 export class UtenteController {
   constructor(private readonly utenteService: UtenteService) {}
 
-  /**
-   * Coverti dal tipo utilizzato internatmente da prisma al dto usato dall'api
-   * @param utente dati utente strutturati da Prisma
-   * @returns dati utente utilizzati dall'api rest
-   */
-  modelToDto(utente: Utente) : CreateUtenteDto {
-    const dto : CreateUtenteDto = {
-      nome: utente.nome,
-      cognome: utente.cognome,
-      email: utente.email,
-    };
-    if (utente.ruolo != null) dto.ruolo=utente.ruolo
-    return dto;
-  }
-
   @Post()
   async create(@Body() createDto: CreateUtenteDto) : Promise<CreateUtenteDto>{
-    //converto Promise<Utente> in Promise<CreateUtenteDto>
-    const utente = this.utenteService.create(createDto);
-    const dto = utente.then(this.modelToDto);
-    return dto;
+    return this.utenteService.create(createDto);
   }
 
   @Get()
-  async findAll(params?: UtenteListParamsDto) : Promise<CreateUtenteDto[]>{
-    const utente = this.utenteService.findAll(params);
-    const dto = utente.then((utenti) => utenti.map(this.modelToDto));
-    return dto;
+  async findAll(@Query(ValidationPipe) params: UtenteListParamsDto) : Promise<CreateUtenteDto[]>{
+    return this.utenteService.findAll(params);
   }
 
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number) : Promise<CreateUtenteDto | null>{
-    const utente : Promise<Utente | null> = this.utenteService.findOne({id: id});
-    const dto : Promise<CreateUtenteDto | null> = utente.then((utente) => {
-      if (utente == null) return null
-      return this.modelToDto(utente);
-    });
-    return dto; 
+    return this.utenteService.findOne(id); 
   }
 
   @Patch(':id')
-  async update(@Param('id', ParseIntPipe) id: number, @Body() updateUtenteDto: UpdateUtenteDto) : Promise<CreateUtenteDto>{
-    const update = {where: {id: id}, data: updateUtenteDto};
-    const utente = this.utenteService.update(update);
-    const dto = utente.then(this.modelToDto);
-    return dto;
+  async update(@Param('id', ParseIntPipe) id: number, @Body() update: UpdateUtenteDto) : Promise<CreateUtenteDto>{
+    return this.utenteService.update(id, update);
   }
 
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number) : Promise<CreateUtenteDto> {
-    const utente = this.utenteService.remove({id});
-    const dto = utente.then(this.modelToDto);
-    return dto;
+    return this.utenteService.remove(id);
   }
 }
