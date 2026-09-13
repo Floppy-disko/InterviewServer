@@ -27,9 +27,10 @@ export class UtenteService {
    * @returns dati utente nel formato esposto dall'api rest
    */
   modelToDto(utente: Utente): CreateUtenteDto {
-    const { ruolo, ...fields } = utente;
     const dto: CreateUtenteDto = {
-      ...fields
+      nome: utente.nome,
+      cognome: utente.cognome,
+      email: utente.email,
     };
     //quando nel db la row ruolo è vuota ruolo risulta null nel model, in quel caso non voglio ruolo nel dto
     if (utente.ruolo !== null) dto.ruolo = utente.ruolo
@@ -42,41 +43,58 @@ export class UtenteService {
   }
 
   listParamsDtoToModel(params: UtenteListParamsDto): ListParamsModel {
-    return params
-  }
-
-  async create(data: CreateUtenteDto): Promise<CreateUtenteDto> {
-    const utente = this.prisma.utente.create({
-      data: this.createDtoToModel(data)
-    });
-    return utente.then(this.modelToDto);
-  }
-
-  async findAll(params: UtenteListParamsDto): Promise<CreateUtenteDto[]> {
-    const utenti = this.prisma.utente.findMany(this.listParamsDtoToModel(params))
-    return utenti.then((utenti) => utenti.map(this.modelToDto));
-  }
-
-  async findOne(id: number): Promise<CreateUtenteDto | null> {
-    const utente = this.prisma.utente.findUnique({
-      where: {id}
-    });
-    const dto = utente.then((utente) => {
-      if (utente === null) return null
-      return this.modelToDto(utente);
-    });
+    const { nome, cognome, email, ruolo, exclude, ...rest } = params;
+    let a: Prisma.UtenteWhereInput;
+    let b: Prisma.StringFilter<"Utente">;
+    const dto : ListParamsModel = {
+      ...rest,
+      select: {
+        nome: !exclude?.includes('nome'),
+        cognome: !exclude?.includes('cognome'),
+        email: !exclude?.includes('email'),
+        ruolo: !exclude?.includes('ruolo') 
+      },
+      where: {
+        //and a livello dei diversi parametri, or a livello dei valori di un singolo parametro
+        AND: [
+          {nome: nome ? { in: nome } : undefined},
+          {cognome: cognome ? { in: cognome } : undefined},
+          {email: email ? { in: email } : undefined},
+          {ruolo: ruolo ? { in: ruolo } : undefined}
+        ]
+      },
+    };
     return dto;
   }
 
+  async create(data: CreateUtenteDto): Promise<CreateUtenteDto> {
+    const utente = await this.prisma.utente.create({
+      data: this.createDtoToModel(data)
+    });
+    return this.modelToDto(utente);
+  }
+
+  async findAll(params: UtenteListParamsDto): Promise<CreateUtenteDto[]> {
+    const utenti = await this.prisma.utente.findMany(this.listParamsDtoToModel(params))
+    return utenti.map(this.modelToDto);
+  }
+
+  async findOne(id: number): Promise<CreateUtenteDto | null> {
+    const utente = await this.prisma.utente.findUnique({
+      where: { id }
+    });
+    return utente!==null ? this.modelToDto(utente) : null;
+  }
+
   async update(id: number, update: UpdateUtenteDto): Promise<CreateUtenteDto> {
-    const utente = this.prisma.utente.update({where: {id}, data: update});
-    return utente.then(this.modelToDto);
+    const utente = await this.prisma.utente.update({ where: { id }, data: update });
+    return this.modelToDto(utente);
   }
 
   async remove(id: number): Promise<CreateUtenteDto> {
-    const utente = this.prisma.utente.delete({
-      where: {id}
-    })
-    return utente.then(this.modelToDto);
+    const utente = await this.prisma.utente.delete({
+      where: { id }
+    });
+    return this.modelToDto(utente);
   }
 }
