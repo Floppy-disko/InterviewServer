@@ -9,5 +9,5 @@ export class CreateUtenteDto {
     cognome!: string;
     @IsOptional()
     @IsString()
-    ruolo?: string | null;
+    ruolo?: string;
 }

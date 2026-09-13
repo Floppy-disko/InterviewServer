@@ -1,34 +1,35 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { IntervistaService } from './intervista.service';
 import { CreateIntervistaDto } from './dto/create-intervista.dto';
 import { UpdateIntervistaDto } from './dto/update-intervista.dto';
+import { IntervistaListParamsDto } from './dto/intervista-list-params.dto';
 
 @Controller('intervista')
 export class IntervistaController {
   constructor(private readonly intervistaService: IntervistaService) {}
 
   @Post()
-  create(@Body() createIntervistaDto: CreateIntervistaDto) {
-    return this.intervistaService.create(createIntervistaDto);
+  create(@Body() createDto: CreateIntervistaDto) {
+    return this.intervistaService.create(createDto);
   }
 
   @Get()
-  findAll() {
-    return this.intervistaService.findAll();
+  findAll(@Query() params: IntervistaListParamsDto) {
+    return this.intervistaService.findAll(params);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.intervistaService.findOne(+id);
+  findOne(@Param('id') id: number) {
+    return this.intervistaService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateIntervistaDto: UpdateIntervistaDto) {
-    return this.intervistaService.update(+id, updateIntervistaDto);
+  update(@Param('id') id: number, @Body() update: UpdateIntervistaDto) {
+    return this.intervistaService.update(id, update);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.intervistaService.remove(+id);
+  remove(@Param('id') id: number) {
+    return this.intervistaService.remove(id);
   }
 }

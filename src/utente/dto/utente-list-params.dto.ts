@@ -1,7 +1,7 @@
-import { Type, Transform } from "class-transformer";
+import { Transform } from "class-transformer";
 import { IsIn, IsInt, IsOptional, IsArray, IsString, IsEmail } from "class-validator";
 
-const UTENTE_FIELDS = ['nome', 'cognome', 'email', 'ruolo'] as const;
+const UTENTE_FIELDS = ['id', 'nome', 'cognome', 'email', 'ruolo'] as const;
 
 function csv({ value }: { value: unknown }){
   return typeof value === 'string' ? value.split(',') : value;
@@ -16,6 +16,12 @@ export class UtenteListParamsDto {
   @IsOptional()
   @IsInt()
   take?: number;
+
+  @IsOptional()
+  @Transform(csv)
+  @IsArray()
+  @IsInt({ each: true })
+  id?: number[];
 
   @IsOptional()
   @Transform(csv)
@@ -48,6 +54,6 @@ export class UtenteListParamsDto {
   exclude?: string[];
 };
 
-//essere sicuro che tutti i campi del model siano presenti nel dto
+//per essere sicuro a compile time che tutti i campi del in UTENTE_FIELDS siano presenti nel dto
 type MissingUtenteFields = Exclude<(typeof UTENTE_FIELDS)[number], keyof UtenteListParamsDto>;
-const allUtenteFieldsAreInTheDto: MissingUtenteFields extends never ? true : never = true;
+const allUtenteFieldsAreInTheDto: (MissingUtenteFields extends never ? true : never) = true;
