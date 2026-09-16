@@ -16,7 +16,7 @@ export class UtenteController {
   }
 
   @Get()
-  findAll(@Query() params: UtenteListParamsDto): Promise<ResponseUtenteDto[]> {
+  findAll(@Query() params: UtenteListParamsDto): Promise<Partial<ResponseUtenteDto>[]> {
     return this.utenteService.findAll(params);
   }
 

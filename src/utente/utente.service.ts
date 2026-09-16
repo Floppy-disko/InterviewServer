@@ -2,13 +2,13 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Prisma, Utente } from '../generated/prisma/client.js';
-import { PrismaService } from "../prisma.service.js";
-import { CreateUtenteDto } from './dto/create-utente.dto.js';
-import { UpdateUtenteDto } from './dto/update-utente.dto.js';
-import { UtenteListParamsDto } from './dto/utente-list-params.dto.js';
-import { ResponseUtenteDto } from './dto/response-utente.dto.js';
-import { UtenteMapper } from './utente.mapper.js';
+import { Prisma, Utente } from '../generated/prisma/client';
+import { PrismaService } from "../prisma.service";
+import { CreateUtenteDto } from './dto/create-utente.dto';
+import { UpdateUtenteDto } from './dto/update-utente.dto';
+import { UtenteListParamsDto } from './dto/utente-list-params.dto';
+import { ResponseUtenteDto } from './dto/response-utente.dto';
+import { UtenteMapper } from './utente.mapper';
 
 @Injectable()
 export class UtenteService {
@@ -36,11 +36,11 @@ export class UtenteService {
     }
   }
 
-  async findAll(params: UtenteListParamsDto): Promise<ResponseUtenteDto[]> {
+  async findAll(params: UtenteListParamsDto): Promise<Partial<ResponseUtenteDto>[]> {
     const utenti: Partial<Utente>[] = await this.prisma.utente.findMany(
       this.mapper.listParamsDtoToModel(params),
     );
-    return utenti.map((utente) => this.mapper.modelToDto(utente));
+    return utenti.map((utente) => this.mapper.modelToPartialDto(utente));
   }
 
   async findOne(id: number): Promise<ResponseUtenteDto> {
@@ -60,7 +60,7 @@ export class UtenteService {
     try {
       const utente = await this.prisma.utente.update({
         where: { id },
-        data: update,
+        data: this.mapper.updateDtoToModel(update),
       });
 
       return this.mapper.modelToDto(utente);

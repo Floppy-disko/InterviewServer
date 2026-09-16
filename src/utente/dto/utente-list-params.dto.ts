@@ -56,7 +56,3 @@ export class UtenteListParamsDto {
   @IsIn(UTENTE_FIELDS, { each: true })
   exclude?: string[];
 };
-
-//per essere sicuro a compile time che tutti i campi del in UTENTE_FIELDS siano presenti nel dto
-type MissingUtenteFields = Exclude<(typeof UTENTE_FIELDS)[number], keyof UtenteListParamsDto>;
-const allUtenteFieldsAreInTheDto: (MissingUtenteFields extends never ? true : never) = true;

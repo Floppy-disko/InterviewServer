@@ -1,14 +1,14 @@
-import { IsDateString, IsInt, IsString, Min } from "class-validator";
+import { IsDate, IsInt, IsString, Min } from "class-validator";
 
 export class BaseIntervistaDto {
-    @IsInt()
-    @Min(0)
-    id!: number;
+    
+    @IsString()
+    stato!: string;
 
-    @IsDateString()
+    @IsDate()
     inizio!: Date;
 
-    @IsDateString()
+    @IsDate()
     fine!: Date;
 
     @IsInt()

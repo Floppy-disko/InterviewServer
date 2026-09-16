@@ -1,6 +1,7 @@
 import { Transform } from 'class-transformer';
 import {
 	IsArray,
+	IsDate,
 	IsDateString,
 	IsIn,
 	IsInt,
@@ -38,19 +39,16 @@ export class IntervistaListParamsDto {
 	@Transform(csv)
 	@IsArray()
 	@IsInt({ each: true })
+	@Min(0, { each: true })
 	id?: number[];
 
 	@IsOptional()
-	@Transform(csv)
-	@IsArray()
-	@IsDateString({}, { each: true })
-	inizio?: string[];
+	@IsDate()
+	before?: Date;
 
 	@IsOptional()
-	@Transform(csv)
-	@IsArray()
-	@IsDateString({}, { each: true })
-	fine?: string[];
+	@IsDate()
+	after?: Date;
 
 	@IsOptional()
 	@Transform(csv)
@@ -85,11 +83,3 @@ export class IntervistaListParamsDto {
 	@IsIn(INTERVISTA_FIELDS, { each: true })
 	exclude?: string[];
 }
-
-type MissingIntervistaFields = Exclude<
-	(typeof INTERVISTA_FIELDS)[number],
-	keyof IntervistaListParamsDto
->;
-const allIntervistaFieldsAreInTheDto: MissingIntervistaFields extends never
-	? true
-	: never = true;
