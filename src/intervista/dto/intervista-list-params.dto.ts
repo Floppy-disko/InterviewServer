@@ -6,6 +6,7 @@ import {
 	IsInt,
 	IsOptional,
 	IsString,
+	Min,
 } from 'class-validator';
 
 const INTERVISTA_FIELDS = [
@@ -25,10 +26,12 @@ function csv({ value }: { value: unknown }) {
 export class IntervistaListParamsDto {
 	@IsOptional()
 	@IsInt()
+	@Min(0)
 	skip?: number;
 
 	@IsOptional()
 	@IsInt()
+	@Min(0)
 	take?: number;
 
 	@IsOptional()
@@ -59,18 +62,21 @@ export class IntervistaListParamsDto {
 	@Transform(csv)
 	@IsArray()
 	@IsInt({ each: true })
+	@Min(0, { each: true })
 	candidato?: number[];
 
 	@IsOptional()
 	@Transform(csv)
 	@IsArray()
 	@IsInt({ each: true })
+	@Min(0, { each: true })
 	intervistatori?: number[];
 
 	@IsOptional()
 	@Transform(csv)
 	@IsArray()
 	@IsInt({ each: true })
+	@Min(0, { each: true })
 	ricerca?: number[];
 
 	@IsOptional()

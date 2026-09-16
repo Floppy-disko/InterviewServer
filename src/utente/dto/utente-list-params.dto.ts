@@ -1,5 +1,5 @@
 import { Transform } from "class-transformer";
-import { IsIn, IsInt, IsOptional, IsArray, IsString, IsEmail } from "class-validator";
+import { Min, IsIn, IsInt, IsOptional, IsArray, IsString, IsEmail } from "class-validator";
 
 const UTENTE_FIELDS = ['id', 'nome', 'cognome', 'email', 'ruolo'] as const;
 
@@ -11,16 +11,19 @@ export class UtenteListParamsDto {
 
   @IsOptional()
   @IsInt()
+  @Min(0)
   skip?: number;
 
   @IsOptional()
   @IsInt()
+  @Min(0)
   take?: number;
 
   @IsOptional()
   @Transform(csv)
   @IsArray()
   @IsInt({ each: true })
+  @Min(0, { each: true })
   id?: number[];
 
   @IsOptional()
