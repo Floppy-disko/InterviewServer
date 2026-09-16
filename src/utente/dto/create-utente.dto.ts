@@ -1,13 +1,3 @@
-import { IsEmail, IsOptional, IsString } from 'class-validator';
+import { BaseUtenteDto } from './base-utente.dto.js';
 
-export class CreateUtenteDto {
-    @IsEmail()
-    email!: string;
-    @IsString()
-    nome!: string;
-    @IsString()
-    cognome!: string;
-    @IsOptional()
-    @IsString()
-    ruolo?: string;
-}
+export class CreateUtenteDto extends BaseUtenteDto {}

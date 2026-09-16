@@ -23,7 +23,7 @@ export class UtenteService {
   }
 
   async findAll(params: UtenteListParamsDto): Promise<ResponseUtenteDto[]> {
-    const utenti = await this.prisma.utente.findMany(
+    const utenti : Partial<Utente>[] = await this.prisma.utente.findMany(
       this.mapper.listParamsDtoToModel(params),
     );
     return utenti.map((utente) => this.mapper.modelToDto(utente));

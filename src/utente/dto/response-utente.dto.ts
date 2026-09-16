@@ -1,19 +1,9 @@
-import { IsEmail, IsInt, IsOptional, IsString } from 'class-validator';
+import { PartialType } from '@nestjs/mapped-types';
+import { IsInt, IsOptional } from 'class-validator';
+import { BaseUtenteDto } from './base-utente.dto.js';
 
-export class ResponseUtenteDto {
-  @IsInt()
-  id!: number;
-
-  @IsEmail()
-  email!: string;
-
-  @IsString()
-  nome!: string;
-
-  @IsString()
-  cognome!: string;
-
+export class ResponseUtenteDto extends PartialType(BaseUtenteDto) {
   @IsOptional()
-  @IsString()
-  ruolo?: string;
+  @IsInt()
+  id?: number;
 }
