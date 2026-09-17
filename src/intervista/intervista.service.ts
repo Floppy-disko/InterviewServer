@@ -14,23 +14,22 @@ import { intervistaSelect } from './intervista.select.js';
 
 @Injectable()
 export class IntervistaService {
-
   constructor(
     private prisma: PrismaService,
     private mapper: IntervistaMapper,
-  ) { }
+  ) {}
 
   /**
    * Verifica se uno o più utenti sono già occupati durante l'intervallo di tempo selezionato.
    * @param utentiIds
    *  lista di id degli utenti da verificare
-   * @param inizio 
+   * @param inizio
    *  data di inizio dell'intervallo di tempo da verificare
-   * @param fine 
+   * @param fine
    *  data di fine dell'intervallo di tempo da verificare
    * @param excludeIntervistaId
    *  intervista da non considerare per le verifiche (utile per l'update)
-   * @returns 
+   * @returns
    *  lista di id degli utenti che sono già occupati durante l'intervallo di tempo selezionato
    */
   private async busyUtenti(
@@ -84,7 +83,7 @@ export class IntervistaService {
    * Verifica se uno o più utenti mancano nel database.
    * @param utentiIds
    *  lista di id degli utenti da verificare
-   * @returns 
+   * @returns
    *  lista di id degli utenti che non esistono nel database
    */
   private async missingUtenti(utentiIds: number[]): Promise<number[]> {
@@ -106,9 +105,9 @@ export class IntervistaService {
    * - inizio < fine
    * - tutti gli utenti esistano
    * - tutti gli utenti siano liberi durante l'intervallo di tempo selezionato
-   * @param data 
+   * @param data
    *  dati di interesse per le verifiche
-   * @param excludeIntervistaId 
+   * @param excludeIntervistaId
    *  intervista da non considerare per le verifiche (utile per l'update,
    *  per non considerare l'intervista su cui sto facendo l'update)
    * @throws BadRequestException se la richiesta non è possibile
@@ -130,9 +129,7 @@ export class IntervistaService {
 
     //controlla che ci sia almeno un intervistatore
     if (data.intervistatori.length === 0) {
-      throw new BadRequestException(
-        'At least one intervistatore is required',
-      );
+      throw new BadRequestException('At least one intervistatore is required');
     }
 
     //controlla che candidato sia diverso da tutti gli intervistatori
@@ -179,11 +176,15 @@ export class IntervistaService {
     return this.mapper.modelToDto(intervista);
   }
 
-  async findAll(params: IntervistaListParamsDto): Promise<Partial<ResponseIntervistaDto>[]> {
+  async findAll(
+    params: IntervistaListParamsDto,
+  ): Promise<Partial<ResponseIntervistaDto>[]> {
     const interviste = await this.prisma.intervista.findMany(
       this.mapper.listParamsDtoToModel(params),
     );
-    return interviste.map((intervista) => this.mapper.modelToPartialDto(intervista));
+    return interviste.map((intervista) =>
+      this.mapper.modelToPartialDto(intervista),
+    );
   }
 
   async findOne(id: number) {

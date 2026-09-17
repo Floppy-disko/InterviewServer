@@ -1,26 +1,74 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateRicercaDto } from './dto/create-ricerca.dto.js';
 import { UpdateRicercaDto } from './dto/update-ricerca.dto.js';
+import { PrismaService } from '../prisma.service.js';
+import { RicercaMapper } from './ricerca.mapper.js';
+import { RicercaListParamsDto } from './dto/ricerca-list-params.dto.js';
+import { Prisma } from '../generated/prisma/client.js';
 
 @Injectable()
 export class RicercaService {
-  create(createRicercaDto: CreateRicercaDto) {
-    return 'This action adds a new ricerca';
+  constructor(
+    private prisma: PrismaService,
+    private mapper: RicercaMapper,
+  ) {}
+
+  async create(createRicercaDto: CreateRicercaDto) {
+    const ricerca = await this.prisma.ricerca.create({
+      data: this.mapper.createDtoToModel(createRicercaDto),
+    });
+    return this.mapper.modelToDto(ricerca);
   }
 
-  findAll() {
-    return `This action returns all ricerca`;
+  async findAll(params: RicercaListParamsDto) {
+    const ricerche = await this.prisma.ricerca.findMany(
+      this.mapper.listParamsDtoToModel(params),
+    );
+    return ricerche.map((ricerca) => this.mapper.modelToDto(ricerca));
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} ricerca`;
+  async findOne(id: number) {
+    const intervista = await this.prisma.ricerca.findUnique({
+      where: { id },
+    });
+    if (!intervista) {
+      throw new NotFoundException(`Ricerca ${id} not found`);
+    }
+    return this.mapper.modelToDto(intervista);
   }
 
-  update(id: number, updateRicercaDto: UpdateRicercaDto) {
-    return `This action updates a #${id} ricerca`;
+  async update(id: number, updateRicercaDto: UpdateRicercaDto) {
+    try {
+      const ricerca = await this.prisma.ricerca.update({
+        where: { id },
+        data: this.mapper.updateDtoToModel(updateRicercaDto),
+      });
+      return this.mapper.modelToDto(ricerca);
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        throw new NotFoundException(`Ricerca ${id} not found`);
+      }
+      throw error;
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} ricerca`;
+  async remove(id: number) {
+    try {
+      const ricerca = await this.prisma.ricerca.delete({
+        where: { id },
+      });
+      return this.mapper.modelToDto(ricerca);
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        throw new NotFoundException(`Ricerca ${id} not found`);
+      }
+      throw error;
+    }
   }
 }

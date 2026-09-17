@@ -1,9 +1,6 @@
-import {
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma, Utente } from '../generated/prisma/client.js';
-import { PrismaService } from "../prisma.service.js";
+import { PrismaService } from '../prisma.service.js';
 import { CreateUtenteDto } from './dto/create-utente.dto.js';
 import { UpdateUtenteDto } from './dto/update-utente.dto.js';
 import { UtenteListParamsDto } from './dto/utente-list-params.dto.js';
@@ -12,16 +9,15 @@ import { UtenteMapper } from './utente.mapper.js';
 
 @Injectable()
 export class UtenteService {
-
   constructor(
     private prisma: PrismaService,
     private mapper: UtenteMapper,
-  ) { }
+  ) {}
 
   async create(data: CreateUtenteDto): Promise<ResponseUtenteDto> {
     try {
       const utente = await this.prisma.utente.create({
-        data: this.mapper.createDtoToModel(data)
+        data: this.mapper.createDtoToModel(data),
       });
       return this.mapper.modelToDto(utente);
     } catch (error) {
@@ -29,14 +25,18 @@ export class UtenteService {
         error instanceof Prisma.PrismaClientKnownRequestError &&
         error.code === 'P2002'
       ) {
-        throw new NotFoundException(`Utente with email ${data.email} already exists`);
+        throw new NotFoundException(
+          `Utente with email ${data.email} already exists`,
+        );
       }
 
       throw error;
     }
   }
 
-  async findAll(params: UtenteListParamsDto): Promise<Partial<ResponseUtenteDto>[]> {
+  async findAll(
+    params: UtenteListParamsDto,
+  ): Promise<Partial<ResponseUtenteDto>[]> {
     const utenti: Partial<Utente>[] = await this.prisma.utente.findMany(
       this.mapper.listParamsDtoToModel(params),
     );
@@ -45,7 +45,7 @@ export class UtenteService {
 
   async findOne(id: number): Promise<ResponseUtenteDto> {
     const utente = await this.prisma.utente.findUnique({
-      where: { id }
+      where: { id },
     });
     if (!utente) {
       throw new NotFoundException(`Utente ${id} not found`);
@@ -79,7 +79,7 @@ export class UtenteService {
   async remove(id: number): Promise<ResponseUtenteDto> {
     try {
       const utente = await this.prisma.utente.delete({
-        where: { id }
+        where: { id },
       });
       return this.mapper.modelToDto(utente);
     } catch (error) {

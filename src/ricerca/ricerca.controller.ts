@@ -1,7 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { RicercaService } from './ricerca.service.js';
 import { CreateRicercaDto } from './dto/create-ricerca.dto.js';
 import { UpdateRicercaDto } from './dto/update-ricerca.dto.js';
+import { RicercaListParamsDto } from './dto/ricerca-list-params.dto.js';
 
 @Controller('ricerca')
 export class RicercaController {
@@ -13,8 +23,8 @@ export class RicercaController {
   }
 
   @Get()
-  findAll() {
-    return this.ricercaService.findAll();
+  findAll(@Query() params: RicercaListParamsDto) {
+    return this.ricercaService.findAll(params);
   }
 
   @Get(':id')

@@ -7,7 +7,6 @@ import { UtenteListParamsDto } from './dto/utente-list-params.dto.js';
 
 @Injectable()
 export class UtenteMapper {
-
   modelToDto(utente: Utente): ResponseUtenteDto {
     const dto: ResponseUtenteDto = {
       id: utente.id,
@@ -43,7 +42,7 @@ export class UtenteMapper {
   }
 
   createDtoToModel(dto: CreateUtenteDto): Prisma.UtenteCreateInput {
-    return dto;
+    return structuredClone(dto);
   }
 
   listParamsDtoToModel(params: UtenteListParamsDto) {

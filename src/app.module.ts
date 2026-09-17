@@ -7,7 +7,12 @@ import { RicercaModule } from './ricerca/ricerca.module.js';
 import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [ConfigModule.forRoot(), UtenteModule, IntervistaModule, RicercaModule],
+  imports: [
+    ConfigModule.forRoot(),
+    UtenteModule,
+    IntervistaModule,
+    RicercaModule,
+  ],
   //controllers: [AppController],
   providers: [AppService],
 })

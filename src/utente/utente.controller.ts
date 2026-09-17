@@ -1,14 +1,23 @@
-import { Controller, Get, Post, Body, Query, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Query,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { UtenteService } from './utente.service.js';
 import { CreateUtenteDto } from './dto/create-utente.dto.js';
 import { ResponseUtenteDto } from './dto/response-utente.dto.js';
 import { UpdateUtenteDto } from './dto/update-utente.dto.js';
 import { UtenteListParamsDto } from './dto/utente-list-params.dto.js';
-import { Utente } from "../generated/prisma/client.js"
+import { Utente } from '../generated/prisma/client.js';
 
 @Controller('utente')
 export class UtenteController {
-  constructor(private readonly utenteService: UtenteService) { }
+  constructor(private readonly utenteService: UtenteService) {}
 
   @Post()
   create(@Body() createDto: CreateUtenteDto): Promise<ResponseUtenteDto> {
@@ -16,7 +25,9 @@ export class UtenteController {
   }
 
   @Get()
-  findAll(@Query() params: UtenteListParamsDto): Promise<Partial<ResponseUtenteDto>[]> {
+  findAll(
+    @Query() params: UtenteListParamsDto,
+  ): Promise<Partial<ResponseUtenteDto>[]> {
     return this.utenteService.findAll(params);
   }
 
@@ -26,7 +37,10 @@ export class UtenteController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: number, @Body() update: UpdateUtenteDto): Promise<ResponseUtenteDto> {
+  update(
+    @Param('id') id: number,
+    @Body() update: UpdateUtenteDto,
+  ): Promise<ResponseUtenteDto> {
     return this.utenteService.update(id, update);
   }
 

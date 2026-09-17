@@ -8,12 +8,13 @@ import { intervistaSelect } from './intervista.select.js';
 
 @Injectable()
 export class IntervistaMapper {
-
   modelToDto(intervista: IntervistaForMapping): ResponseIntervistaDto {
     return structuredClone(intervista);
   }
 
-  modelToPartialDto(intervista: Partial<IntervistaForMapping>): Partial<ResponseIntervistaDto> {
+  modelToPartialDto(
+    intervista: Partial<IntervistaForMapping>,
+  ): Partial<ResponseIntervistaDto> {
     return structuredClone(intervista);
   }
 
@@ -66,7 +67,7 @@ export class IntervistaMapper {
       where: {
         AND: [
           { id: id ? { in: id } : undefined },
-          { inizio: after ? { gt: after }: undefined },
+          { inizio: after ? { gt: after } : undefined },
           { fine: before ? { lt: before } : undefined },
           { stato: stato ? { in: stato } : undefined },
           {
@@ -83,7 +84,9 @@ export class IntervistaMapper {
     };
   }
 
-  updateDtoToModel(dto: Partial<CreateIntervistaDto>): Prisma.IntervistaUpdateInput {
+  updateDtoToModel(
+    dto: Partial<CreateIntervistaDto>,
+  ): Prisma.IntervistaUpdateInput {
     const { candidato, intervistatori, ricerca, ...rest } = dto;
 
     const model: Prisma.IntervistaUpdateInput = {

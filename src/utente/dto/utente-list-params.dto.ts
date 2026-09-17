@@ -1,14 +1,21 @@
-import { Transform } from "class-transformer";
-import { Min, IsIn, IsInt, IsOptional, IsArray, IsString, IsEmail } from "class-validator";
+import { Transform } from 'class-transformer';
+import {
+  Min,
+  IsIn,
+  IsInt,
+  IsOptional,
+  IsArray,
+  IsString,
+  IsEmail,
+} from 'class-validator';
 
 const UTENTE_FIELDS = ['id', 'nome', 'cognome', 'email', 'ruolo'] as const;
 
-function csv({ value }: { value: unknown }){
+function csv({ value }: { value: unknown }) {
   return typeof value === 'string' ? value.split(',') : value;
 }
 
 export class UtenteListParamsDto {
-
   @IsOptional()
   @IsInt()
   @Min(0)
@@ -55,4 +62,4 @@ export class UtenteListParamsDto {
   @IsArray()
   @IsIn(UTENTE_FIELDS, { each: true })
   exclude?: string[];
-};
+}

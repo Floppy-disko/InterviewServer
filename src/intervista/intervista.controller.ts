@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { IntervistaService } from './intervista.service.js';
 import { CreateIntervistaDto } from './dto/create-intervista.dto.js';
 import { UpdateIntervistaDto } from './dto/update-intervista.dto.js';
