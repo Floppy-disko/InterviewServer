@@ -15,4 +15,8 @@ export class CreateIntervistaDto extends BaseIntervistaDto {
     @IsInt({ each: true })
     @Min(0, { each: true })
     intervistatori!: number[];
+
+    @IsInt()
+    @Min(0)
+    ricerca!: number;
 }

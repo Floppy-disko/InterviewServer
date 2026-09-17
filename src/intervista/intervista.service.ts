@@ -9,7 +9,8 @@ import { ResponseIntervistaDto } from './dto/response-intervista.dto';
 import { PrismaService } from '../prisma.service';
 import { IntervistaListParamsDto } from './dto/intervista-list-params.dto';
 import { IntervistaMapper } from './intervista.mapper';
-import { Intervista, Prisma } from '../generated/prisma/client';
+import { Prisma } from '../generated/prisma/client';
+import { intervistaSelect } from './intervista.select';
 
 @Injectable()
 export class IntervistaService {
@@ -19,13 +20,30 @@ export class IntervistaService {
     private mapper: IntervistaMapper,
   ) { }
 
-  async busyUtenti(
+  /**
+   * Verifica se uno o più utenti sono già occupati durante l'intervallo di tempo selezionato.
+   * @param utentiIds
+   *  lista di id degli utenti da verificare
+   * @param inizio 
+   *  data di inizio dell'intervallo di tempo da verificare
+   * @param fine 
+   *  data di fine dell'intervallo di tempo da verificare
+   * @param excludeIntervistaId
+   *  intervista da non considerare per le verifiche (utile per l'update)
+   * @returns 
+   *  lista di id degli utenti che sono già occupati durante l'intervallo di tempo selezionato
+   */
+  private async busyUtenti(
     utentiIds: number[],
     inizio: Date,
     fine: Date,
+    excludeIntervistaId?: number,
   ): Promise<number[]> {
     const overlappingInterviste = await this.prisma.intervista.findMany({
       where: {
+        ...(excludeIntervistaId === undefined
+          ? {}
+          : { id: { not: excludeIntervistaId } }),
         OR: [
           {
             candidatoId: { in: utentiIds },
@@ -62,6 +80,14 @@ export class IntervistaService {
     ].filter((id) => utentiIds.includes(id));
   }
 
+  /**
+   * Verifica se uno o più utenti mancano nel database.
+   * @param utentiIds
+   *  lista di id degli utenti da verificare
+   * @returns 
+   *  lista di id degli utenti che non esistono nel database
+   */
+  private
   async missingUtenti(utentiIds: number[]): Promise<number[]> {
     const foundUtenti = await this.prisma.utente.findMany({
       where: { id: { in: utentiIds } },
@@ -72,9 +98,29 @@ export class IntervistaService {
     return utentiIds.filter((id) => !foundUtentiIds.has(id));
   }
 
-  async create(data: CreateIntervistaDto): Promise<ResponseIntervistaDto> {
-
-    //controlla che la ricerca esista
+  /**
+   * Tutti i controlli per verificare che un intervista sia possibile/valida.
+   * Controlla che:
+   * - la ricerca esista
+   * - ci sia almeno un intervistatore
+   * - inizio < fine
+   * - tutti gli utenti esistano
+   * - tutti gli utenti siano liberi durante l'intervallo di tempo selezionato
+   * @param data 
+   *  dati di interesse per le verifiche
+   * @param excludeIntervistaId 
+   *  intervista da non considerare per le verifiche (utile per l'update,
+   *  per non considerare l'intervista su cui sto facendo l'update)
+   * @throws BadRequestException se la richiesta non è possibile
+   * @throws NotFoundException se la ricerca o gli utenti non esistono
+   */
+  private async validateIntervista(
+    data: Pick<
+      CreateIntervistaDto,
+      'candidato' | 'intervistatori' | 'ricerca' | 'inizio' | 'fine'
+    >,
+    excludeIntervistaId?: number,
+  ): Promise<void> {
     const ricerca = await this.prisma.ricerca.findUnique({
       where: { id: data.ricerca },
     });
@@ -89,7 +135,7 @@ export class IntervistaService {
       );
     }
 
-    if (new Date(data.inizio) >= new Date(data.fine)) {
+    if (data.inizio >= data.fine) {
       throw new BadRequestException('inizio must be before fine');
     }
 
@@ -106,41 +152,93 @@ export class IntervistaService {
       utentiIds,
       data.inizio,
       data.fine,
+      excludeIntervistaId,
     );
     if (busyUtentiIds.length > 0) {
       throw new BadRequestException(
         `Utenti already busy during the selected time: ${busyUtentiIds.join(', ')}`,
       );
     }
+  }
+
+  async create(data: CreateIntervistaDto): Promise<ResponseIntervistaDto> {
+    await this.validateIntervista(data);
 
     const intervista = await this.prisma.intervista.create({
       data: this.mapper.createDtoToModel(data),
-      include: {
-        candidato: true,
-        intervistatori: true,
-        ricerca: true,
-      }
+      select: intervistaSelect,
     });
-    
+
     return this.mapper.modelToDto(intervista);
   }
 
   async findAll(params: IntervistaListParamsDto): Promise<Partial<ResponseIntervistaDto>[]> {
-    const utenti: Partial<Intervista>[] = await this.prisma.intervista.findMany(
-          this.mapper.listParamsDtoToModel(params),
-        );
-        return utenti.map((utente) => this.mapper.modelToPartialDto(utente));
+    const interviste = await this.prisma.intervista.findMany(
+      this.mapper.listParamsDtoToModel(params),
+    );
+    return interviste.map((intervista) => this.mapper.modelToPartialDto(intervista));
   }
 
   async findOne(id: number) {
-    return `This action returns a #${id} intervista`;
+    const intervista = await this.prisma.intervista.findUnique({
+      where: { id },
+      select: intervistaSelect,
+    });
+    if (!intervista) {
+      throw new NotFoundException(`Intervista ${id} not found`);
+    }
+    return this.mapper.modelToDto(intervista);
   }
 
   async update(id: number, updateIntervistaDto: UpdateIntervistaDto) {
-    return `This action updates a #${id} intervista`;
+    const intervista = await this.prisma.intervista.findUnique({
+      where: { id },
+      select: intervistaSelect,
+    });
+    if (!intervista) {
+      throw new NotFoundException(`Intervista ${id} not found`);
+    }
+
+    //prima di fare l'update controlla che con l'update i valori continuino ad essere possibili
+    //se un valore rimane invariato, lo prendo dall'intervista già presente nel database
+    await this.validateIntervista(
+      {
+        inizio: updateIntervistaDto.inizio ?? intervista.inizio,
+        fine: updateIntervistaDto.fine ?? intervista.fine,
+        candidato: updateIntervistaDto.candidato ?? intervista.candidato.id,
+        intervistatori:
+          updateIntervistaDto.intervistatori ??
+          intervista.intervistatori.map((intervistatore) => intervistatore.id),
+        ricerca: updateIntervistaDto.ricerca ?? intervista.ricerca.id,
+      },
+      id,
+    );
+
+    const updateData = this.mapper.updateDtoToModel(updateIntervistaDto);
+
+    const updatedIntervista = await this.prisma.intervista.update({
+      where: { id },
+      data: updateData,
+      select: intervistaSelect,
+    });
+
+    return this.mapper.modelToDto(updatedIntervista);
   }
 
   async remove(id: number) {
-    return `This action removes a #${id} intervista`;
+    const intervista = await this.prisma.intervista.findUnique({
+      where: { id },
+      select: intervistaSelect,
+    });
+    if (!intervista) {
+      throw new NotFoundException(`Intervista ${id} not found`);
+    }
+
+    const deletedIntervista = await this.prisma.intervista.delete({
+      where: { id },
+      select: intervistaSelect,
+    });
+
+    return this.mapper.modelToDto(deletedIntervista);
   }
 }

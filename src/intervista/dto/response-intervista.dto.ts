@@ -10,6 +10,13 @@ export class UtenteSummaryDto extends PickType(
   ['id', 'nome', 'cognome'] as const,
 ) { }
 
+//nonostante sia un tipo semplice mi serve una classe per poter usare i decorators di class-validator
+export class RicercaSummaryDto {
+  @IsInt()
+  @Min(0)
+  id!: number;
+}
+
 export class ResponseIntervistaDto extends BaseIntervistaDto{
 
   @IsInt()
@@ -22,4 +29,7 @@ export class ResponseIntervistaDto extends BaseIntervistaDto{
   @IsArray()
   @ValidateNested({ each: true })
   intervistatori!: UtenteSummaryDto[];
+
+  @ValidateNested()
+  ricerca!: RicercaSummaryDto;
 }
