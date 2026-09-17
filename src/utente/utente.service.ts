@@ -1,26 +1,96 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { Prisma, Utente } from '../generated/prisma/client.js';
+import { PrismaService } from "../prisma.service.js";
 import { CreateUtenteDto } from './dto/create-utente.dto.js';
 import { UpdateUtenteDto } from './dto/update-utente.dto.js';
+import { UtenteListParamsDto } from './dto/utente-list-params.dto.js';
+import { ResponseUtenteDto } from './dto/response-utente.dto.js';
+import { UtenteMapper } from './utente.mapper.js';
 
 @Injectable()
 export class UtenteService {
-  create(createUtenteDto: CreateUtenteDto) {
-    return 'This action adds a new utente';
+
+  constructor(
+    private prisma: PrismaService,
+    private mapper: UtenteMapper,
+  ) { }
+
+  async create(data: CreateUtenteDto): Promise<ResponseUtenteDto> {
+    try {
+      const utente = await this.prisma.utente.create({
+        data: this.mapper.createDtoToModel(data)
+      });
+      return this.mapper.modelToDto(utente);
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2002'
+      ) {
+        throw new NotFoundException(`Utente with email ${data.email} already exists`);
+      }
+
+      throw error;
+    }
   }
 
-  findAll() {
-    return `This action returns all utente`;
+  async findAll(params: UtenteListParamsDto): Promise<Partial<ResponseUtenteDto>[]> {
+    const utenti: Partial<Utente>[] = await this.prisma.utente.findMany(
+      this.mapper.listParamsDtoToModel(params),
+    );
+    return utenti.map((utente) => this.mapper.modelToPartialDto(utente));
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} utente`;
+  async findOne(id: number): Promise<ResponseUtenteDto> {
+    const utente = await this.prisma.utente.findUnique({
+      where: { id }
+    });
+    if (!utente) {
+      throw new NotFoundException(`Utente ${id} not found`);
+    }
+    return this.mapper.modelToDto(utente);
   }
 
-  update(id: number, updateUtenteDto: UpdateUtenteDto) {
-    return `This action updates a #${id} utente`;
+  async update(
+    id: number,
+    update: UpdateUtenteDto,
+  ): Promise<ResponseUtenteDto> {
+    try {
+      const utente = await this.prisma.utente.update({
+        where: { id },
+        data: this.mapper.updateDtoToModel(update),
+      });
+
+      return this.mapper.modelToDto(utente);
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        throw new NotFoundException(`Utente ${id} not found`);
+      }
+
+      throw error;
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} utente`;
+  async remove(id: number): Promise<ResponseUtenteDto> {
+    try {
+      const utente = await this.prisma.utente.delete({
+        where: { id }
+      });
+      return this.mapper.modelToDto(utente);
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        throw new NotFoundException(`Utente ${id} not found`);
+      }
+
+      throw error;
+    }
   }
 }
