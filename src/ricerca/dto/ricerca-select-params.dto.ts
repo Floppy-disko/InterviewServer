@@ -1,16 +1,9 @@
-import { Transform } from 'class-transformer';
-import { IsArray, IsIn, IsOptional } from 'class-validator';
+import { IsIn } from 'class-validator';
+import { SelectParamsDto } from '../../dto/select-params.dto.js';
 
 export const RICERCA_FIELDS = ['id', 'stato', 'descrizione'] as const;
 
-function csv({ value }: { value: unknown }) {
-  return typeof value === 'string' ? value.split(',') : value;
-}
-
-export class RicercaSelectParamsDto {
-  @IsOptional()
-  @Transform(csv)
-  @IsArray()
+export class RicercaSelectParamsDto extends SelectParamsDto {
   @IsIn(RICERCA_FIELDS, { each: true })
-  exclude?: string[];
+  declare exclude?: (typeof RICERCA_FIELDS)[number][];
 }

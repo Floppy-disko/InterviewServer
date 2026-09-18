@@ -7,6 +7,7 @@ import {
   Min,
 } from 'class-validator';
 import { IntervistaWhereParamsDto } from './Intervista-where-params.dto.js';
+import { SelectParamsDto } from '../../dto/select-params.dto.js';
 
 export const INTERVISTA_FIELDS = [
   'id',
@@ -18,14 +19,9 @@ export const INTERVISTA_FIELDS = [
   'ricerca',
 ] as const;
 
-function csv({ value }: { value: unknown }) {
-  return typeof value === 'string' ? value.split(',') : value;
+export class IntervistaSelectParamsDto extends SelectParamsDto {
+  @IsIn(INTERVISTA_FIELDS, { each: true })
+  declare exclude?: (typeof INTERVISTA_FIELDS)[number][];
 }
 
-export class IntervistaSelectParamsDto {
-  @IsOptional()
-  @Transform(csv)
-  @IsArray()
-  @IsIn(INTERVISTA_FIELDS, { each: true })
-  exclude?: string[];
-}
+let a : IntervistaSelectParamsDto;

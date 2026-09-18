@@ -1,5 +1,5 @@
-import { Transform } from 'class-transformer';
-import { IsArray, IsIn, IsOptional } from 'class-validator';
+import { IsIn } from 'class-validator';
+import { SelectParamsDto } from '../../dto/select-params.dto.js';
 
 export const UTENTE_FIELDS = [
   'id',
@@ -9,14 +9,7 @@ export const UTENTE_FIELDS = [
   'ruolo',
 ] as const;
 
-function csv({ value }: { value: unknown }) {
-  return typeof value === 'string' ? value.split(',') : value;
-}
-
-export class UtenteSelectParamsDto {
-  @IsOptional()
-  @Transform(csv)
-  @IsArray()
-  @IsIn(UTENTE_FIELDS, { each: true })
-  exclude?: string[];
+export class UtenteSelectParamsDto extends SelectParamsDto {
+@IsIn(UTENTE_FIELDS, { each: true })
+  declare exclude?: (typeof UTENTE_FIELDS)[number][];
 }
