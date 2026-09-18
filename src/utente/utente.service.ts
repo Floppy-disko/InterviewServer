@@ -3,9 +3,10 @@ import { Prisma, Utente } from '../generated/prisma/client.js';
 import { PrismaService } from '../prisma.service.js';
 import { CreateUtenteDto } from './dto/create-utente.dto.js';
 import { UpdateUtenteDto } from './dto/update-utente.dto.js';
-import { UtenteListParamsDto } from './dto/utente-list-params.dto.js';
+import { UtenteSelectParamsDto } from './dto/utente-select-params.dto.js';
 import { ResponseUtenteDto } from './dto/response-utente.dto.js';
 import { UtenteMapper } from './utente.mapper.js';
+import { UtenteFindAllParamsDto } from './utente.controller.js';
 
 @Injectable()
 export class UtenteService {
@@ -35,22 +36,26 @@ export class UtenteService {
   }
 
   async findAll(
-    params: UtenteListParamsDto,
+    params: UtenteFindAllParamsDto,
   ): Promise<Partial<ResponseUtenteDto>[]> {
     const utenti: Partial<Utente>[] = await this.prisma.utente.findMany(
-      this.mapper.listParamsDtoToModel(params),
+      this.mapper.allParamsDtoToModel(params),
     );
     return utenti.map((utente) => this.mapper.modelToPartialDto(utente));
   }
 
-  async findOne(id: number): Promise<ResponseUtenteDto> {
+  async findOne(
+    id: number,
+    params: UtenteSelectParamsDto,
+  ): Promise<Partial<ResponseUtenteDto>> {
     const utente = await this.prisma.utente.findUnique({
       where: { id },
+      select: this.mapper.selectParamsDtoToModel(params),
     });
     if (!utente) {
       throw new NotFoundException(`Utente ${id} not found`);
     }
-    return this.mapper.modelToDto(utente);
+    return this.mapper.modelToPartialDto(utente);
   }
 
   async update(

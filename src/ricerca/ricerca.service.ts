@@ -3,8 +3,9 @@ import { CreateRicercaDto } from './dto/create-ricerca.dto.js';
 import { UpdateRicercaDto } from './dto/update-ricerca.dto.js';
 import { PrismaService } from '../prisma.service.js';
 import { RicercaMapper } from './ricerca.mapper.js';
-import { RicercaListParamsDto } from './dto/ricerca-list-params.dto.js';
+import { RicercaSelectParamsDto } from './dto/ricerca-select-params.dto.js';
 import { Prisma } from '../generated/prisma/client.js';
+import { RicercaFindAllParamsDto } from './ricerca.controller.js';
 
 @Injectable()
 export class RicercaService {
@@ -20,21 +21,22 @@ export class RicercaService {
     return this.mapper.modelToDto(ricerca);
   }
 
-  async findAll(params: RicercaListParamsDto) {
+  async findAll(params: RicercaFindAllParamsDto) {
     const ricerche = await this.prisma.ricerca.findMany(
-      this.mapper.listParamsDtoToModel(params),
+      this.mapper.allParamsDtoToModel(params),
     );
-    return ricerche.map((ricerca) => this.mapper.modelToDto(ricerca));
+    return ricerche.map((ricerca) => this.mapper.modelToPartialDto(ricerca));
   }
 
-  async findOne(id: number) {
+  async findOne(id: number, params: RicercaSelectParamsDto) {
     const intervista = await this.prisma.ricerca.findUnique({
       where: { id },
+      select: this.mapper.selectParamsDtoToModel(params),
     });
     if (!intervista) {
       throw new NotFoundException(`Ricerca ${id} not found`);
     }
-    return this.mapper.modelToDto(intervista);
+    return this.mapper.modelToPartialDto(intervista);
   }
 
   async update(id: number, updateRicercaDto: UpdateRicercaDto) {

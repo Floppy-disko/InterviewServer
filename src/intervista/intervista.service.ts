@@ -7,10 +7,12 @@ import { CreateIntervistaDto } from './dto/create-intervista.dto.js';
 import { UpdateIntervistaDto } from './dto/update-intervista.dto.js';
 import { ResponseIntervistaDto } from './dto/response-intervista.dto.js';
 import { PrismaService } from '../prisma.service.js';
-import { IntervistaListParamsDto } from './dto/intervista-list-params.dto.js';
+import { IntervistaSelectParamsDto } from './dto/intervista-select-params.dto.js';
+import { IntervistaWhereParamsDto } from './dto/Intervista-where-params.dto.js';
 import { IntervistaMapper } from './intervista.mapper.js';
 import { Prisma } from '../generated/prisma/client.js';
 import { intervistaSelect } from './intervista.select.js';
+import { IntervistaFindAllParamsDto } from './intervista.controller.js';
 
 @Injectable()
 export class IntervistaService {
@@ -177,28 +179,28 @@ export class IntervistaService {
   }
 
   async findAll(
-    params: IntervistaListParamsDto,
+    params: IntervistaFindAllParamsDto,
   ): Promise<Partial<ResponseIntervistaDto>[]> {
     const interviste = await this.prisma.intervista.findMany(
-      this.mapper.listParamsDtoToModel(params),
+      this.mapper.allParamsDtoToModel(params),
     );
     return interviste.map((intervista) =>
       this.mapper.modelToPartialDto(intervista),
     );
   }
 
-  async findOne(id: number) {
+  async findOne(id: number, params: IntervistaSelectParamsDto) : Promise<Partial<ResponseIntervistaDto>> {
     const intervista = await this.prisma.intervista.findUnique({
       where: { id },
-      select: intervistaSelect,
+      select: this.mapper.selectParamsDtoToModel(params),
     });
     if (!intervista) {
       throw new NotFoundException(`Intervista ${id} not found`);
     }
-    return this.mapper.modelToDto(intervista);
+    return this.mapper.modelToPartialDto(intervista);
   }
 
-  async update(id: number, updateIntervistaDto: UpdateIntervistaDto) {
+  async update(id: number, updateIntervistaDto: UpdateIntervistaDto) : Promise<ResponseIntervistaDto> {
     const intervista = await this.prisma.intervista.findUnique({
       where: { id },
       select: intervistaSelect,
@@ -233,7 +235,7 @@ export class IntervistaService {
     return this.mapper.modelToDto(updatedIntervista);
   }
 
-  async remove(id: number) {
+  async remove(id: number) : Promise<ResponseIntervistaDto> {
     const intervista = await this.prisma.intervista.findUnique({
       where: { id },
       select: intervistaSelect,

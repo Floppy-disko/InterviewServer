@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma, Utente } from '../generated/prisma/client.js';
-import { PrismaService } from '../prisma.service.js';
 import { CreateUtenteDto } from './dto/create-utente.dto.js';
 import { ResponseUtenteDto } from './dto/response-utente.dto.js';
-import { UtenteListParamsDto } from './dto/utente-list-params.dto.js';
+import { UtenteSelectParamsDto } from './dto/utente-select-params.dto.js';
+import { UtenteWhereParamsDto } from './dto/utente-where-params.dto.js';
+import { UtenteFindAllParamsDto } from './utente.controller.js';
 
 @Injectable()
 export class UtenteMapper {
@@ -45,27 +46,47 @@ export class UtenteMapper {
     return structuredClone(dto);
   }
 
-  listParamsDtoToModel(params: UtenteListParamsDto) {
+  selectParamsDtoToModel(params: UtenteSelectParamsDto) {
+    const { exclude } = params;
+
+    return {
+      id: !exclude?.includes('id'),
+      nome: !exclude?.includes('nome'),
+      cognome: !exclude?.includes('cognome'),
+      email: !exclude?.includes('email'),
+      ruolo: !exclude?.includes('ruolo'),
+    };
+  }
+
+  whereParamsDtoToModel(params: UtenteWhereParamsDto) {
+    const { id, nome, cognome, email, ruolo } = params;
+
+    return {
+      AND: [
+        { id: id ? { in: id } : undefined },
+        { nome: nome ? { in: nome } : undefined },
+        { cognome: cognome ? { in: cognome } : undefined },
+        { email: email ? { in: email } : undefined },
+        { ruolo: ruolo ? { in: ruolo } : undefined },
+      ],
+    };
+  }
+
+  allParamsDtoToModel(
+    params: UtenteFindAllParamsDto,
+  ): Prisma.UtenteFindManyArgs {
     const { id, nome, cognome, email, ruolo, exclude, ...rest } = params;
 
     return {
       ...rest,
-      select: {
-        id: !exclude?.includes('id'),
-        nome: !exclude?.includes('nome'),
-        cognome: !exclude?.includes('cognome'),
-        email: !exclude?.includes('email'),
-        ruolo: !exclude?.includes('ruolo'),
-      },
-      where: {
-        AND: [
-          { id: id ? { in: id } : undefined },
-          { nome: nome ? { in: nome } : undefined },
-          { cognome: cognome ? { in: cognome } : undefined },
-          { email: email ? { in: email } : undefined },
-          { ruolo: ruolo ? { in: ruolo } : undefined },
-        ],
-      },
+      select: this.selectParamsDtoToModel({ exclude }),
+      where: this.whereParamsDtoToModel({
+        id,
+        nome,
+        cognome,
+        email,
+        ruolo,
+      }),
     };
   }
 }

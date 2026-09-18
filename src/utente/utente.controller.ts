@@ -12,8 +12,12 @@ import { UtenteService } from './utente.service.js';
 import { CreateUtenteDto } from './dto/create-utente.dto.js';
 import { ResponseUtenteDto } from './dto/response-utente.dto.js';
 import { UpdateUtenteDto } from './dto/update-utente.dto.js';
-import { UtenteListParamsDto } from './dto/utente-list-params.dto.js';
-import { Utente } from '../generated/prisma/client.js';
+import { UtenteSelectParamsDto } from './dto/utente-select-params.dto.js';
+import { UtenteWhereParamsDto } from './dto/utente-where-params.dto.js';
+import { PaginationParamsDto } from '../dto/pagination-params.dto.js';
+
+export type UtenteFindAllParamsDto =
+  UtenteSelectParamsDto & UtenteWhereParamsDto & PaginationParamsDto;
 
 @Controller('utente')
 export class UtenteController {
@@ -26,14 +30,17 @@ export class UtenteController {
 
   @Get()
   findAll(
-    @Query() params: UtenteListParamsDto,
+    @Query() params: UtenteFindAllParamsDto,
   ): Promise<Partial<ResponseUtenteDto>[]> {
     return this.utenteService.findAll(params);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number): Promise<ResponseUtenteDto | null> {
-    return this.utenteService.findOne(id);
+  findOne(
+    @Param('id') id: number,
+    @Query() params: UtenteSelectParamsDto,
+  ): Promise<Partial<ResponseUtenteDto>> {
+    return this.utenteService.findOne(id, params);
   }
 
   @Patch(':id')

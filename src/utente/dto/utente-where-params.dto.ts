@@ -1,31 +1,18 @@
 import { Transform } from 'class-transformer';
 import {
-  Min,
-  IsIn,
+  IsArray,
+  IsEmail,
   IsInt,
   IsOptional,
-  IsArray,
   IsString,
-  IsEmail,
+  Min,
 } from 'class-validator';
-
-const UTENTE_FIELDS = ['id', 'nome', 'cognome', 'email', 'ruolo'] as const;
 
 function csv({ value }: { value: unknown }) {
   return typeof value === 'string' ? value.split(',') : value;
 }
 
-export class UtenteListParamsDto {
-  @IsOptional()
-  @IsInt()
-  @Min(0)
-  skip?: number;
-
-  @IsOptional()
-  @IsInt()
-  @Min(0)
-  take?: number;
-
+export class UtenteWhereParamsDto {
   @IsOptional()
   @Transform(csv)
   @IsArray()
@@ -56,10 +43,4 @@ export class UtenteListParamsDto {
   @IsArray()
   @IsString({ each: true })
   ruolo?: string[];
-
-  @IsOptional()
-  @Transform(csv)
-  @IsArray()
-  @IsIn(UTENTE_FIELDS, { each: true })
-  exclude?: string[];
 }

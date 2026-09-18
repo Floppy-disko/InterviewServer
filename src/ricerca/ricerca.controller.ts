@@ -11,7 +11,12 @@ import {
 import { RicercaService } from './ricerca.service.js';
 import { CreateRicercaDto } from './dto/create-ricerca.dto.js';
 import { UpdateRicercaDto } from './dto/update-ricerca.dto.js';
-import { RicercaListParamsDto } from './dto/ricerca-list-params.dto.js';
+import { RicercaSelectParamsDto } from './dto/ricerca-select-params.dto.js';
+import { RicercaWhereParamsDto } from './dto/ricerca-where-params.dto.js';
+import { PaginationParamsDto } from '../dto/pagination-params.dto.js';
+
+export type RicercaFindAllParamsDto =
+  RicercaSelectParamsDto & RicercaWhereParamsDto & PaginationParamsDto;
 
 @Controller('ricerca')
 export class RicercaController {
@@ -23,13 +28,13 @@ export class RicercaController {
   }
 
   @Get()
-  findAll(@Query() params: RicercaListParamsDto) {
+  findAll(@Query() params: RicercaFindAllParamsDto) {
     return this.ricercaService.findAll(params);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.ricercaService.findOne(+id);
+  findOne(@Param('id') id: string, @Query() params: RicercaSelectParamsDto) {
+    return this.ricercaService.findOne(+id, params);
   }
 
   @Patch(':id')

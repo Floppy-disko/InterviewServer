@@ -9,15 +9,11 @@ export const intervistaSelect = {
   candidato: {
     select: {
       id: true,
-      nome: true,
-      cognome: true,
     },
   },
   intervistatori: {
     select: {
       id: true,
-      nome: true,
-      cognome: true,
     },
   },
   ricerca: {

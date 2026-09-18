@@ -11,7 +11,11 @@ import {
 import { IntervistaService } from './intervista.service.js';
 import { CreateIntervistaDto } from './dto/create-intervista.dto.js';
 import { UpdateIntervistaDto } from './dto/update-intervista.dto.js';
-import { IntervistaListParamsDto } from './dto/intervista-list-params.dto.js';
+import { IntervistaSelectParamsDto } from './dto/intervista-select-params.dto.js';
+import { IntervistaWhereParamsDto } from './dto/Intervista-where-params.dto.js';
+import { PaginationParamsDto } from '../dto/pagination-params.dto.js';
+
+export type IntervistaFindAllParamsDto = IntervistaSelectParamsDto & IntervistaWhereParamsDto & PaginationParamsDto
 
 @Controller('intervista')
 export class IntervistaController {
@@ -23,13 +27,13 @@ export class IntervistaController {
   }
 
   @Get()
-  findAll(@Query() params: IntervistaListParamsDto) {
+  findAll(@Query() params: IntervistaFindAllParamsDto) {
     return this.intervistaService.findAll(params);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number) {
-    return this.intervistaService.findOne(id);
+  findOne(@Param('id') id: number, @Query() params: IntervistaSelectParamsDto) {
+    return this.intervistaService.findOne(id, params);
   }
 
   @Patch(':id')
