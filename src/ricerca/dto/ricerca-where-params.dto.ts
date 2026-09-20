@@ -24,4 +24,18 @@ export class RicercaWhereParamsDto {
   @IsArray()
   @IsString({ each: true })
   stato?: string[];
+
+  @IsOptional()
+  @Transform(csv)
+  @IsArray()
+  @IsInt({ each: true })
+  @Min(0, { each: true })
+  interviste?: number[];
+
+  @IsOptional()
+  @Transform(csv)
+  @IsArray()
+  @IsInt({ each: true })
+  @Min(0, { each: true })
+  selezionati?: number[];
 }

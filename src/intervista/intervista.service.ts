@@ -5,7 +5,6 @@ import {
 } from '@nestjs/common';
 import { CreateIntervistaDto } from './dto/create-intervista.dto.js';
 import { UpdateIntervistaDto } from './dto/update-intervista.dto.js';
-import { ResponseIntervistaDto } from './dto/response-intervista.dto.js';
 import { PrismaService } from '../prisma.service.js';
 import { IntervistaSelectParamsDto } from './dto/intervista-select-params.dto.js';
 import { IntervistaWhereParamsDto } from './dto/Intervista-where-params.dto.js';
@@ -13,12 +12,16 @@ import { IntervistaMapper } from './intervista.mapper.js';
 import { Prisma } from '../generated/prisma/client.js';
 import { intervistaSelect } from './intervista.select.js';
 import { IntervistaFindAllParamsDto } from './intervista.controller.js';
+import { ResponseIntervistaDto } from './dto/response-intervista.dto.js';
+import { DeepPartial } from './intervista.mapper.js';
+import { AppMapper } from '../app.mapper.js';
 
 @Injectable()
 export class IntervistaService {
   constructor(
     private prisma: PrismaService,
     private mapper: IntervistaMapper,
+    private appMapper: AppMapper,
   ) {}
 
   /**
@@ -175,21 +178,19 @@ export class IntervistaService {
       select: intervistaSelect,
     });
 
-    return this.mapper.modelToDto(intervista);
+    return this.appMapper.mapIntervista(intervista) as ResponseIntervistaDto;
   }
 
   async findAll(
     params: IntervistaFindAllParamsDto,
-  ): Promise<Partial<ResponseIntervistaDto>[]> {
+  ): Promise<DeepPartial<ResponseIntervistaDto>[]> {
     const interviste = await this.prisma.intervista.findMany(
       this.mapper.allParamsDtoToModel(params),
     );
-    return interviste.map((intervista) =>
-      this.mapper.modelToPartialDto(intervista),
-    );
+    return interviste.map((intervista) => this.appMapper.mapIntervista(intervista));
   }
 
-  async findOne(id: number, params: IntervistaSelectParamsDto) : Promise<Partial<ResponseIntervistaDto>> {
+  async findOne(id: number, params: IntervistaSelectParamsDto) : Promise<DeepPartial<ResponseIntervistaDto>> {
     const intervista = await this.prisma.intervista.findUnique({
       where: { id },
       select: this.mapper.selectParamsDtoToModel(params),
@@ -197,7 +198,7 @@ export class IntervistaService {
     if (!intervista) {
       throw new NotFoundException(`Intervista ${id} not found`);
     }
-    return this.mapper.modelToPartialDto(intervista);
+    return this.appMapper.mapIntervista(intervista);
   }
 
   async update(id: number, updateIntervistaDto: UpdateIntervistaDto) : Promise<ResponseIntervistaDto> {
@@ -232,13 +233,12 @@ export class IntervistaService {
       select: intervistaSelect,
     });
 
-    return this.mapper.modelToDto(updatedIntervista);
+    return this.appMapper.mapIntervista(updatedIntervista) as ResponseIntervistaDto;
   }
 
   async remove(id: number) : Promise<ResponseIntervistaDto> {
     const intervista = await this.prisma.intervista.findUnique({
       where: { id },
-      select: intervistaSelect,
     });
     if (!intervista) {
       throw new NotFoundException(`Intervista ${id} not found`);
@@ -249,6 +249,6 @@ export class IntervistaService {
       select: intervistaSelect,
     });
 
-    return this.mapper.modelToDto(deletedIntervista);
+    return this.appMapper.mapIntervista(deletedIntervista) as ResponseIntervistaDto;
   }
 }

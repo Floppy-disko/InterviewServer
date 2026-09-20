@@ -11,7 +11,7 @@ import {
   Min,
   ValidateNested,
 } from 'class-validator';
-import { BaseIntervistaDto } from './base-intervista-dto.js';
+import { BaseIntervistaDto } from './base-intervista.dto.js';
 
 export class CreateIntervistaDto extends BaseIntervistaDto {
   @IsInt()

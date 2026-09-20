@@ -1,8 +1,9 @@
-import { IsInt, Min } from 'class-validator';
 import { BaseRicercaDto } from './base-ricerca.dto.js';
+import type { ResponseIntervistaDto } from '../../intervista/dto/response-intervista.dto.js';
+import type { ResponseUtenteDto } from '../../utente/dto/response-utente.dto.js';
 
 export class ResponseRicercaDto extends BaseRicercaDto {
-  @IsInt()
-  @Min(0)
   id: number;
+  interviste!: (number | ResponseIntervistaDto)[];
+  selezionati!: (number | ResponseUtenteDto)[];
 }

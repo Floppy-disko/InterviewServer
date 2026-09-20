@@ -43,4 +43,25 @@ export class UtenteWhereParamsDto {
   @IsArray()
   @IsString({ each: true })
   ruolo?: string[];
+
+  @IsOptional()
+  @Transform(csv)
+  @IsArray()
+  @IsInt({ each: true })
+  @Min(0, { each: true })
+  intervisteRicevute?: number[];
+
+  @IsOptional()
+  @Transform(csv)
+  @IsArray()
+  @IsInt({ each: true })
+  @Min(0, { each: true })
+  intervisteEffettuate?: number[];
+
+  @IsOptional()
+  @Transform(csv)
+  @IsArray()
+  @IsInt({ each: true })
+  @Min(0, { each: true })
+  selezionatoIn?: number[];
 }

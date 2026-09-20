@@ -1,24 +1,35 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '../generated/prisma/client.js';
 import { CreateIntervistaDto } from './dto/create-intervista.dto.js';
-import { ResponseIntervistaDto } from './dto/response-intervista.dto.js';
 import { IntervistaSelectParamsDto } from './dto/intervista-select-params.dto.js';
 import { IntervistaWhereParamsDto } from './dto/Intervista-where-params.dto.js';
 import { IntervistaForMapping } from './intervista.select.js';
 import { intervistaSelect } from './intervista.select.js';
 import { IntervistaFindAllParamsDto } from './intervista.controller.js';
+import { ResponseIntervistaDto } from './dto/response-intervista.dto.js';
+
+//partial ricorsivo
+export type DeepPartial<T> =
+  T extends readonly (infer U)[] ? readonly DeepPartial<U>[] :
+  T extends object ? { [K in keyof T]?: DeepPartial<T[K]> } :
+  T;
+
+//intervsita include relazioni
+type IntervistaFull = Prisma.IntervistaGetPayload<{
+  include: {
+    candidato: true;
+    intervistatori: true;
+    ricerca: true;
+  };
+}>;
 
 @Injectable()
 export class IntervistaMapper {
-
-  modelToDto(intervista: IntervistaForMapping): ResponseIntervistaDto {
-    return structuredClone(intervista);
-  }
-
-  modelToPartialDto(
-    intervista: Partial<IntervistaForMapping>,
-  ): Partial<ResponseIntervistaDto> {
-    return structuredClone(intervista);
+  modelToDto(
+    intervista: DeepPartial<IntervistaFull>,
+  ): DeepPartial<ResponseIntervistaDto> {
+    const { candidato, intervistatori, ricerca, ...rest } = intervista;
+    return rest;
   }
 
   /**
@@ -40,8 +51,8 @@ export class IntervistaMapper {
     };
   }
 
-  selectParamsDtoToModel(params: IntervistaSelectParamsDto) {
-    const { exclude } = params;
+  selectParamsDtoToModel(params: IntervistaSelectParamsDto) : Prisma.IntervistaSelect {
+    const { exclude, fullRelations } = params;
 
     return {
       id: !exclude?.includes('id'),
@@ -49,17 +60,23 @@ export class IntervistaMapper {
       fine: !exclude?.includes('fine'),
       stato: !exclude?.includes('stato'),
 
-      candidato: exclude?.includes('candidato')
-        ? false
-        : intervistaSelect.candidato,
+      ...(!exclude?.includes('candidato') && 
+        { candidato: fullRelations
+          ? true
+          : {select: {id: true}}
+        }),
+        
+      ...(!exclude?.includes('intervistatori') &&
+        { intervistatori: fullRelations
+          ? true
+          : {select: {id: true}}    
+        }),
 
-      intervistatori: exclude?.includes('intervistatori')
-        ? false
-        : intervistaSelect.intervistatori,
-
-      ricerca: exclude?.includes('ricerca')
-        ? false
-        : intervistaSelect.ricerca,
+      ...(!exclude?.includes('ricerca') &&
+        { ricerca: fullRelations
+          ? true
+          : {select: {id: true}}
+        }),
     };
   }
 
@@ -105,10 +122,11 @@ export class IntervistaMapper {
       intervistatori,
       ricerca,
       exclude,
+      fullRelations,
       ...rest
     } = params;
 
-    const select = this.selectParamsDtoToModel({ exclude });
+    const select = this.selectParamsDtoToModel({ exclude, fullRelations });
     const where = this.whereParamsDtoToModel({
       id,
       before,

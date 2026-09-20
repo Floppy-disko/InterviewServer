@@ -24,14 +24,14 @@ export class UtenteController {
   constructor(private readonly utenteService: UtenteService) {}
 
   @Post()
-  create(@Body() createDto: CreateUtenteDto): Promise<ResponseUtenteDto> {
+  create(@Body() createDto: CreateUtenteDto) {
     return this.utenteService.create(createDto);
   }
 
   @Get()
   findAll(
     @Query() params: UtenteFindAllParamsDto,
-  ): Promise<Partial<ResponseUtenteDto>[]> {
+  ) {
     return this.utenteService.findAll(params);
   }
 
@@ -39,7 +39,7 @@ export class UtenteController {
   findOne(
     @Param('id') id: number,
     @Query() params: UtenteSelectParamsDto,
-  ): Promise<Partial<ResponseUtenteDto>> {
+  ) {
     return this.utenteService.findOne(id, params);
   }
 

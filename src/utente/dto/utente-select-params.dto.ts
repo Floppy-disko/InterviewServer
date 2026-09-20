@@ -7,9 +7,12 @@ export const UTENTE_FIELDS = [
   'cognome',
   'email',
   'ruolo',
+  'intervisteRicevute',
+  'intervisteEffettuate',
+  'selezionatoIn',
 ] as const;
 
 export class UtenteSelectParamsDto extends SelectParamsDto {
-@IsIn(UTENTE_FIELDS, { each: true })
+  @IsIn(UTENTE_FIELDS, { each: true })
   declare exclude?: (typeof UTENTE_FIELDS)[number][];
 }

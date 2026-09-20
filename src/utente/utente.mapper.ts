@@ -6,29 +6,36 @@ import { UtenteSelectParamsDto } from './dto/utente-select-params.dto.js';
 import { UtenteWhereParamsDto } from './dto/utente-where-params.dto.js';
 import { UtenteFindAllParamsDto } from './utente.controller.js';
 
+export type DeepPartial<T> =
+  T extends readonly (infer U)[] ? readonly DeepPartial<U>[] :
+  T extends object ? { [K in keyof T]?: DeepPartial<T[K]> } :
+  T;
+
+type UtenteFull = Prisma.UtenteGetPayload<{
+  include: {
+    intervisteRicevute: true;
+    intervisteEffettuate: true;
+    selezionatoIn: true;
+  };
+}>;
+
 @Injectable()
 export class UtenteMapper {
-  modelToDto(utente: Utente): ResponseUtenteDto {
-    const dto: ResponseUtenteDto = {
-      id: utente.id,
-      nome: utente.nome,
-      cognome: utente.cognome,
-      email: utente.email,
+  modelToDto(
+    utente: DeepPartial<UtenteFull>,
+  ): DeepPartial<ResponseUtenteDto> {
+    const {
+      intervisteRicevute,
+      intervisteEffettuate,
+      selezionatoIn,
+      ruolo,
+      ...rest
+    } = utente;
+
+    return {
+      ...rest,
+      ...(ruolo && { ruolo }),
     };
-    if (utente.ruolo != null) dto.ruolo = utente.ruolo;
-    return dto;
-  }
-
-  modelToPartialDto(utente: Partial<Utente>): Partial<ResponseUtenteDto> {
-    const dto: Partial<ResponseUtenteDto> = {};
-
-    if (utente.id != null) dto.id = utente.id;
-    if (utente.nome != null) dto.nome = utente.nome;
-    if (utente.cognome != null) dto.cognome = utente.cognome;
-    if (utente.email != null) dto.email = utente.email;
-    if (utente.ruolo != null) dto.ruolo = utente.ruolo;
-
-    return dto;
   }
 
   updateDtoToModel(dto: Partial<CreateUtenteDto>): Prisma.UtenteUpdateInput {
@@ -46,8 +53,8 @@ export class UtenteMapper {
     return structuredClone(dto);
   }
 
-  selectParamsDtoToModel(params: UtenteSelectParamsDto) {
-    const { exclude } = params;
+  selectParamsDtoToModel(params: UtenteSelectParamsDto): Prisma.UtenteSelect {
+    const { exclude, fullRelations } = params;
 
     return {
       id: !exclude?.includes('id'),
@@ -55,11 +62,29 @@ export class UtenteMapper {
       cognome: !exclude?.includes('cognome'),
       email: !exclude?.includes('email'),
       ruolo: !exclude?.includes('ruolo'),
+      ...(!exclude?.includes('intervisteRicevute') && {
+        intervisteRicevute: fullRelations ? true : { select: { id: true } },
+      }),
+      ...(!exclude?.includes('intervisteEffettuate') && {
+        intervisteEffettuate: fullRelations ? true : { select: { id: true } },
+      }),
+      ...(!exclude?.includes('selezionatoIn') && {
+        selezionatoIn: fullRelations ? true : { select: { id: true } },
+      }),
     };
   }
 
   whereParamsDtoToModel(params: UtenteWhereParamsDto) {
-    const { id, nome, cognome, email, ruolo } = params;
+    const {
+      id,
+      nome,
+      cognome,
+      email,
+      ruolo,
+      intervisteRicevute,
+      intervisteEffettuate,
+      selezionatoIn,
+    } = params;
 
     return {
       AND: [
@@ -68,6 +93,21 @@ export class UtenteMapper {
         { cognome: cognome ? { in: cognome } : undefined },
         { email: email ? { in: email } : undefined },
         { ruolo: ruolo ? { in: ruolo } : undefined },
+        {
+          intervisteRicevute: intervisteRicevute
+            ? { some: { id: { in: intervisteRicevute } } }
+            : undefined,
+        },
+        {
+          intervisteEffettuate: intervisteEffettuate
+            ? { some: { id: { in: intervisteEffettuate } } }
+            : undefined,
+        },
+        {
+          selezionatoIn: selezionatoIn
+            ? { id: { in: selezionatoIn } }
+            : undefined,
+        },
       ],
     };
   }
@@ -75,17 +115,32 @@ export class UtenteMapper {
   allParamsDtoToModel(
     params: UtenteFindAllParamsDto,
   ): Prisma.UtenteFindManyArgs {
-    const { id, nome, cognome, email, ruolo, exclude, ...rest } = params;
+    const {
+      id,
+      nome,
+      cognome,
+      email,
+      ruolo,
+      intervisteRicevute,
+      intervisteEffettuate,
+      selezionatoIn,
+      exclude,
+      fullRelations,
+      ...rest
+    } = params;
 
     return {
       ...rest,
-      select: this.selectParamsDtoToModel({ exclude }),
+      select: this.selectParamsDtoToModel({ exclude, fullRelations }),
       where: this.whereParamsDtoToModel({
         id,
         nome,
         cognome,
         email,
         ruolo,
+        intervisteRicevute,
+        intervisteEffettuate,
+        selezionatoIn,
       }),
     };
   }

@@ -1,9 +1,10 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { IsInt, IsOptional, Min } from 'class-validator';
 import { BaseUtenteDto } from './base-utente.dto.js';
+import type { ResponseIntervistaDto } from '../../intervista/dto/response-intervista.dto.js';
+import type { ResponseRicercaDto } from '../../ricerca/dto/response-ricerca.dto.js';
 
 export class ResponseUtenteDto extends BaseUtenteDto {
-  @IsInt()
-  @Min(0)
   id?: number;
+  intervisteRicevute!: (number | ResponseIntervistaDto)[];
+  intervisteEffettuate!: (number | ResponseIntervistaDto)[];
+  selezionatoIn?: number | ResponseRicercaDto;
 }

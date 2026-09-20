@@ -23,5 +23,3 @@ export class IntervistaSelectParamsDto extends SelectParamsDto {
   @IsIn(INTERVISTA_FIELDS, { each: true })
   declare exclude?: (typeof INTERVISTA_FIELDS)[number][];
 }
-
-let a : IntervistaSelectParamsDto;
