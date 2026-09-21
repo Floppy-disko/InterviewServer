@@ -13,7 +13,7 @@ import { ConfigModule } from '@nestjs/config';
     IntervistaModule,
     RicercaModule,
   ],
-  //controllers: [AppController],
+  controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {}

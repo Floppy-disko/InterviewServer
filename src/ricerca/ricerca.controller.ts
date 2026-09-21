@@ -8,6 +8,7 @@ import {
   Delete,
   Query,
 } from '@nestjs/common';
+import { IntersectionType } from '@nestjs/mapped-types';
 import { RicercaService } from './ricerca.service.js';
 import { CreateRicercaDto } from './dto/create-ricerca.dto.js';
 import { UpdateRicercaDto } from './dto/update-ricerca.dto.js';
@@ -15,8 +16,10 @@ import { RicercaSelectParamsDto } from './dto/ricerca-select-params.dto.js';
 import { RicercaWhereParamsDto } from './dto/ricerca-where-params.dto.js';
 import { PaginationParamsDto } from '../dto/pagination-params.dto.js';
 
-export type RicercaFindAllParamsDto =
-  RicercaSelectParamsDto & RicercaWhereParamsDto & PaginationParamsDto;
+export class RicercaFindAllParamsDto extends IntersectionType(
+  IntersectionType(RicercaSelectParamsDto, RicercaWhereParamsDto),
+  PaginationParamsDto,
+) {}
 
 @Controller('ricerca')
 export class RicercaController {

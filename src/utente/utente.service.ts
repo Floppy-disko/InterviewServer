@@ -19,13 +19,13 @@ export class UtenteService {
     private appMapper: AppMapper,
   ) {}
 
-  async create(data: CreateUtenteDto): Promise<ResponseUtenteDto> {
+  async create(data: CreateUtenteDto) {
     try {
       const utente = await this.prisma.utente.create({
         data: this.mapper.createDtoToModel(data),
         select: utenteSelect,
       });
-      return this.appMapper.mapUtente(utente) as ResponseUtenteDto;
+      return this.appMapper.mapUtente(utente);
     } catch (error) {
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
@@ -66,7 +66,7 @@ export class UtenteService {
   async update(
     id: number,
     update: UpdateUtenteDto,
-  ): Promise<ResponseUtenteDto> {
+  ) {
     try {
       const utente = await this.prisma.utente.update({
         where: { id },
@@ -74,7 +74,7 @@ export class UtenteService {
         select: utenteSelect,
       });
 
-      return this.appMapper.mapUtente(utente) as ResponseUtenteDto;
+      return this.appMapper.mapUtente(utente);
     } catch (error) {
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
@@ -87,18 +87,13 @@ export class UtenteService {
     }
   }
 
-  async remove(id: number): Promise<ResponseUtenteDto> {
+  async remove(id: number) {
     try {
-      const utente = await this.prisma.utente.findUnique({ where: { id } });
-      if (!utente) {
-        throw new NotFoundException(`Utente ${id} not found`);
-      }
-
       const deletedUtente = await this.prisma.utente.delete({
         where: { id },
         select: utenteSelect,
       });
-      return this.appMapper.mapUtente(deletedUtente) as ResponseUtenteDto;
+      return this.appMapper.mapUtente(deletedUtente);
     } catch (error) {
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&

@@ -66,6 +66,7 @@ export class RicercaService {
     try {
       const ricerca = await this.prisma.ricerca.delete({
         where: { id },
+        select: ricercaSelect,
       });
       return this.appMapper.mapRicerca(ricerca);
     } catch (error) {

@@ -237,17 +237,13 @@ export class IntervistaService {
   }
 
   async remove(id: number) : Promise<ResponseIntervistaDto> {
-    const intervista = await this.prisma.intervista.findUnique({
-      where: { id },
-    });
-    if (!intervista) {
-      throw new NotFoundException(`Intervista ${id} not found`);
-    }
-
     const deletedIntervista = await this.prisma.intervista.delete({
       where: { id },
       select: intervistaSelect,
     });
+    if (!deletedIntervista) {
+      throw new NotFoundException(`Intervista ${id} not found`);
+    }
 
     return this.appMapper.mapIntervista(deletedIntervista) as ResponseIntervistaDto;
   }

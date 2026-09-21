@@ -12,9 +12,13 @@ function csv({ value }: { value: unknown }) {
   return typeof value === 'string' ? value.split(',') : value;
 }
 
+function csvNumber({ value }: { value: unknown }) {
+  return typeof value === 'string' ? value.split(',').map(Number) : value;
+}
+
 export class UtenteWhereParamsDto {
   @IsOptional()
-  @Transform(csv)
+  @Transform(csvNumber)
   @IsArray()
   @IsInt({ each: true })
   @Min(0, { each: true })
@@ -45,21 +49,21 @@ export class UtenteWhereParamsDto {
   ruolo?: string[];
 
   @IsOptional()
-  @Transform(csv)
+  @Transform(csvNumber)
   @IsArray()
   @IsInt({ each: true })
   @Min(0, { each: true })
   intervisteRicevute?: number[];
 
   @IsOptional()
-  @Transform(csv)
+  @Transform(csvNumber)
   @IsArray()
   @IsInt({ each: true })
   @Min(0, { each: true })
   intervisteEffettuate?: number[];
 
   @IsOptional()
-  @Transform(csv)
+  @Transform(csvNumber)
   @IsArray()
   @IsInt({ each: true })
   @Min(0, { each: true })

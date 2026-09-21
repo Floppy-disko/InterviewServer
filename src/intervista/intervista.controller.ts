@@ -8,6 +8,7 @@ import {
   Delete,
   Query,
 } from '@nestjs/common';
+import { IntersectionType } from '@nestjs/mapped-types';
 import { IntervistaService } from './intervista.service.js';
 import { CreateIntervistaDto } from './dto/create-intervista.dto.js';
 import { UpdateIntervistaDto } from './dto/update-intervista.dto.js';
@@ -15,7 +16,10 @@ import { IntervistaSelectParamsDto } from './dto/intervista-select-params.dto.js
 import { IntervistaWhereParamsDto } from './dto/Intervista-where-params.dto.js';
 import { PaginationParamsDto } from '../dto/pagination-params.dto.js';
 
-export type IntervistaFindAllParamsDto = IntervistaSelectParamsDto & IntervistaWhereParamsDto & PaginationParamsDto
+export class IntervistaFindAllParamsDto extends IntersectionType(
+  IntersectionType(IntervistaSelectParamsDto, IntervistaWhereParamsDto),
+  PaginationParamsDto,
+) {}
 
 @Controller('intervista')
 export class IntervistaController {

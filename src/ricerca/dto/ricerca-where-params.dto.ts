@@ -11,9 +11,13 @@ function csv({ value }: { value: unknown }) {
   return typeof value === 'string' ? value.split(',') : value;
 }
 
+function csvNumber({ value }: { value: unknown }) {
+  return typeof value === 'string' ? value.split(',').map(Number) : value;
+}
+
 export class RicercaWhereParamsDto {
   @IsOptional()
-  @Transform(csv)
+  @Transform(csvNumber)
   @IsArray()
   @IsInt({ each: true })
   @Min(0, { each: true })
@@ -26,14 +30,14 @@ export class RicercaWhereParamsDto {
   stato?: string[];
 
   @IsOptional()
-  @Transform(csv)
+  @Transform(csvNumber)
   @IsArray()
   @IsInt({ each: true })
   @Min(0, { each: true })
   interviste?: number[];
 
   @IsOptional()
-  @Transform(csv)
+  @Transform(csvNumber)
   @IsArray()
   @IsInt({ each: true })
   @Min(0, { each: true })

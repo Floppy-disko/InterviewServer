@@ -8,6 +8,7 @@ import {
   Param,
   Delete,
 } from '@nestjs/common';
+import { IntersectionType } from '@nestjs/mapped-types';
 import { UtenteService } from './utente.service.js';
 import { CreateUtenteDto } from './dto/create-utente.dto.js';
 import { ResponseUtenteDto } from './dto/response-utente.dto.js';
@@ -16,8 +17,12 @@ import { UtenteSelectParamsDto } from './dto/utente-select-params.dto.js';
 import { UtenteWhereParamsDto } from './dto/utente-where-params.dto.js';
 import { PaginationParamsDto } from '../dto/pagination-params.dto.js';
 
-export type UtenteFindAllParamsDto =
-  UtenteSelectParamsDto & UtenteWhereParamsDto & PaginationParamsDto;
+//classe che combina tutti i tipi di query paramter
+//serve che sia una classe così che class-validator sappia il tipo a runtime
+export class UtenteFindAllParamsDto extends IntersectionType(
+  IntersectionType(UtenteSelectParamsDto, UtenteWhereParamsDto),
+  PaginationParamsDto,
+) {}
 
 @Controller('utente')
 export class UtenteController {
@@ -47,12 +52,12 @@ export class UtenteController {
   update(
     @Param('id') id: number,
     @Body() update: UpdateUtenteDto,
-  ): Promise<ResponseUtenteDto> {
+  ) {
     return this.utenteService.update(id, update);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: number): Promise<ResponseUtenteDto> {
+  remove(@Param('id') id: number) {
     return this.utenteService.remove(id);
   }
 }
