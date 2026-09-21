@@ -236,6 +236,87 @@ export class IntervistaService {
     return this.appMapper.mapIntervista(updatedIntervista) as ResponseIntervistaDto;
   }
 
+  async addIntervistatore(
+    id: number,
+    utenteId: number,
+  ): Promise<ResponseIntervistaDto> {
+    const intervista = await this.prisma.intervista.findUnique({
+      where: { id },
+      select: intervistaSelect,
+    });
+    if (!intervista) {
+      throw new NotFoundException(`Intervista ${id} not found`);
+    }
+
+    const intervistatori = [
+      ...intervista.intervistatori.map((intervistatore) => intervistatore.id),
+      utenteId,
+    ];
+    await this.validateIntervista(
+      {
+        inizio: intervista.inizio,
+        fine: intervista.fine,
+        candidato: intervista.candidato.id,
+        intervistatori,
+        ricerca: intervista.ricerca.id,
+      },
+      id,
+    );
+
+    const updatedIntervista = await this.prisma.intervista.update({
+      where: { id },
+      data: { intervistatori: { connect: { id: utenteId } } },
+      select: intervistaSelect,
+    });
+
+    return this.appMapper.mapIntervista(updatedIntervista) as ResponseIntervistaDto;
+  }
+
+  async removeIntervistatore(
+    id: number,
+    utenteId: number,
+  ): Promise<ResponseIntervistaDto> {
+    const intervista = await this.prisma.intervista.findUnique({
+      where: { id },
+      select: intervistaSelect,
+    });
+    if (!intervista) {
+      throw new NotFoundException(`Intervista ${id} not found`);
+    }
+
+    const intervistatori = intervista.intervistatori
+      .map((intervistatore) => intervistatore.id)
+      .filter((currentId) => currentId !== utenteId);
+    if (intervistatori.length === intervista.intervistatori.length) {
+      throw new NotFoundException(
+        `Utente ${utenteId} is not an intervistatore for Intervista ${id}`,
+      );
+    }
+
+    await this.validateIntervista(
+      {
+        inizio: intervista.inizio,
+        fine: intervista.fine,
+        candidato: intervista.candidato.id,
+        intervistatori,
+        ricerca: intervista.ricerca.id,
+      },
+      id,
+    );
+
+    const updatedIntervista = await this.prisma.intervista.update({
+      where: { id },
+      data: {
+        intervistatori: {
+          set: intervistatori.map((currentId) => ({ id: currentId })),
+        },
+      },
+      select: intervistaSelect,
+    });
+
+    return this.appMapper.mapIntervista(updatedIntervista) as ResponseIntervistaDto;
+  }
+
   async remove(id: number) : Promise<ResponseIntervistaDto> {
     const deletedIntervista = await this.prisma.intervista.delete({
       where: { id },

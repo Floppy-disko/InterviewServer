@@ -5,6 +5,7 @@ import { UtenteModule } from './utente/utente.module.js';
 import { IntervistaModule } from './intervista/intervista.module.js';
 import { RicercaModule } from './ricerca/ricerca.module.js';
 import { ConfigModule } from '@nestjs/config';
+import { PrismaService } from './prisma.service.js';
 
 @Module({
   imports: [
@@ -14,6 +15,6 @@ import { ConfigModule } from '@nestjs/config';
     RicercaModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, PrismaService],
 })
 export class AppModule {}

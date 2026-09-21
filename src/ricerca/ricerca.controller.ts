@@ -15,6 +15,7 @@ import { UpdateRicercaDto } from './dto/update-ricerca.dto.js';
 import { RicercaSelectParamsDto } from './dto/ricerca-select-params.dto.js';
 import { RicercaWhereParamsDto } from './dto/ricerca-where-params.dto.js';
 import { PaginationParamsDto } from '../dto/pagination-params.dto.js';
+import { UtenteIdDto } from '../dto/utente-id.dto.js';
 
 export class RicercaFindAllParamsDto extends IntersectionType(
   IntersectionType(RicercaSelectParamsDto, RicercaWhereParamsDto),
@@ -43,6 +44,19 @@ export class RicercaController {
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateRicercaDto: UpdateRicercaDto) {
     return this.ricercaService.update(+id, updateRicercaDto);
+  }
+
+  @Post(':id/selezionato')
+  addSelezionato(@Param('id') id: string, @Body() body: UtenteIdDto) {
+    return this.ricercaService.addSelezionato(+id, body.utenteId);
+  }
+
+  @Delete(':id/selezionato/:utenteId')
+  removeSelezionato(
+    @Param('id') id: string,
+    @Param('utenteId') utenteId: string,
+  ) {
+    return this.ricercaService.removeSelezionato(+id, +utenteId);
   }
 
   @Delete(':id')

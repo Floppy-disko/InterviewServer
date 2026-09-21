@@ -9,6 +9,7 @@ describe('RicercaController (e2e)', () => {
   let app: INestApplication<App>;
   let prisma: PrismaService;
   const descrizione = `ricerca-e2e-${Date.now()}`;
+  const selezionatoEmail = `ricerca-selezionato-e2e-${Date.now()}@example.com`;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -24,10 +25,20 @@ describe('RicercaController (e2e)', () => {
     );
     prisma = app.get(PrismaService);
     await app.init();
+
+    await request(app.getHttpServer())
+      .post('/utente')
+      .send({
+        email: selezionatoEmail,
+        nome: 'Selezionato',
+        cognome: 'E2E',
+      })
+      .expect(201);
   });
 
   afterAll(async () => {
     await prisma.ricerca.deleteMany({ where: { descrizione } });
+    await prisma.utente.deleteMany({ where: { email: selezionatoEmail } });
     await app.close();
   });
 
@@ -59,6 +70,26 @@ describe('RicercaController (e2e)', () => {
       .expect(200)
       .expect(({ body }) => {
         expect(body).toMatchObject({ id, descrizione, stato: 'chiusa' });
+      });
+
+    const utente = await prisma.utente.findUniqueOrThrow({
+      where: { email: selezionatoEmail },
+      select: { id: true },
+    });
+
+    await request(app.getHttpServer())
+      .post(`/ricerca/${id}/selezionato`)
+      .send({ utenteId: utente.id })
+      .expect(201)
+      .expect(({ body }) => {
+        expect(body.selezionati).toContain(utente.id);
+      });
+
+    await request(app.getHttpServer())
+      .delete(`/ricerca/${id}/selezionato/${utente.id}`)
+      .expect(200)
+      .expect(({ body }) => {
+        expect(body.selezionati).not.toContain(utente.id);
       });
 
     await request(app.getHttpServer())

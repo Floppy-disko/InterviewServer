@@ -15,6 +15,7 @@ import { UpdateIntervistaDto } from './dto/update-intervista.dto.js';
 import { IntervistaSelectParamsDto } from './dto/intervista-select-params.dto.js';
 import { IntervistaWhereParamsDto } from './dto/Intervista-where-params.dto.js';
 import { PaginationParamsDto } from '../dto/pagination-params.dto.js';
+import { UtenteIdDto } from '../dto/utente-id.dto.js';
 
 export class IntervistaFindAllParamsDto extends IntersectionType(
   IntersectionType(IntervistaSelectParamsDto, IntervistaWhereParamsDto),
@@ -43,6 +44,19 @@ export class IntervistaController {
   @Patch(':id')
   update(@Param('id') id: number, @Body() update: UpdateIntervistaDto) {
     return this.intervistaService.update(id, update);
+  }
+
+  @Post(':id/intervistatori')
+  addIntervistatore(@Param('id') id: number, @Body() body: UtenteIdDto) {
+    return this.intervistaService.addIntervistatore(id, body.utenteId);
+  }
+
+  @Delete(':id/intervistatori/:utenteId')
+  removeIntervistatore(
+    @Param('id') id: number,
+    @Param('utenteId') utenteId: number,
+  ) {
+    return this.intervistaService.removeIntervistatore(id, utenteId);
   }
 
   @Delete(':id')

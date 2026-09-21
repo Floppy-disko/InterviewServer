@@ -62,6 +62,59 @@ export class RicercaService {
     }
   }
 
+  async addSelezionato(id: number, utenteId: number) {
+    const ricerca = await this.prisma.ricerca.findUnique({ where: { id } });
+    if (!ricerca) {
+      throw new NotFoundException(`Ricerca ${id} not found`);
+    }
+
+    const utente = await this.prisma.utente.findUnique({
+      where: { id: utenteId },
+    });
+    if (!utente) {
+      throw new NotFoundException(`Utente ${utenteId} not found`);
+    }
+
+    await this.prisma.utente.update({
+      where: { id: utenteId },
+      data: { selezionatoIn: { connect: { id } } },
+    });
+
+    const updatedRicerca = await this.prisma.ricerca.findUniqueOrThrow({
+      where: { id },
+      select: ricercaSelect,
+    });
+    return this.appMapper.mapRicerca(updatedRicerca);
+  }
+
+  async removeSelezionato(id: number, utenteId: number) {
+    const ricerca = await this.prisma.ricerca.findUnique({ where: { id } });
+    if (!ricerca) {
+      throw new NotFoundException(`Ricerca ${id} not found`);
+    }
+
+    const utente = await this.prisma.utente.findUnique({
+      where: { id: utenteId },
+      select: { selezionatoInId: true },
+    });
+    if (!utente || utente.selezionatoInId !== id) {
+      throw new NotFoundException(
+        `Utente ${utenteId} is not selected for Ricerca ${id}`,
+      );
+    }
+
+    await this.prisma.utente.update({
+      where: { id: utenteId },
+      data: { selezionatoIn: { disconnect: true } },
+    });
+
+    const updatedRicerca = await this.prisma.ricerca.findUniqueOrThrow({
+      where: { id },
+      select: ricercaSelect,
+    });
+    return this.appMapper.mapRicerca(updatedRicerca);
+  }
+
   async remove(id: number) {
     try {
       const ricerca = await this.prisma.ricerca.delete({
