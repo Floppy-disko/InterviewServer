@@ -7,6 +7,12 @@ import { RicercaMapper } from './ricerca/ricerca.mapper.js';
 import { ResponseUtenteDto } from './utente/dto/response-utente.dto.js';
 import { UtenteMapper } from './utente/utente.mapper.js';
 
+//le funzioni per mappare da tipi output di prisma a dto di risposta
+//non le metto nei rispettivi mapper per evitare dipendenze circolari tra mapper 
+// (es. utenteMapper dipende da intervistaMapper che dipende da utenteMapper)
+// vista che il mapper di una risorsa chiama ricorsivamente i mapper delle risorse con cui ha relazioni
+// abbastanza predisposta per nesting arbitrario di risorse, ma ho evitato di implementarlo
+
 export type DeepPartial<T> =
   T extends readonly (infer U)[] ? readonly DeepPartial<U>[] :
   T extends object ? { [K in keyof T]?: DeepPartial<T[K]> } :
@@ -68,6 +74,7 @@ export class AppMapper {
     };
   }
 
+  //fa in modo di ritornare sempre un dto anche se l'utente è solo un id (visto che mapUtenteRelation può ritornare un numero)
   mapUtente(
     utente: DeepPartial<UtenteFull>,
   ): DeepPartial<ResponseUtenteDto> {
@@ -75,6 +82,7 @@ export class AppMapper {
     return typeof mapped === 'number' ? { id: mapped } : mapped;
   }
 
+  //se l'utente è solo un id, ritorna l'id, altrimenti ritorna l'utente mappato
   private mapUtenteRelation(
     utente: DeepPartial<UtenteFull>,
   ): DeepPartial<ResponseUtenteDto> | number {

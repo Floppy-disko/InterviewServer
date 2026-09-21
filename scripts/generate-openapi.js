@@ -1,19 +1,10 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module.js';
-import { ValidationPipe } from '@nestjs/common';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import * as fs from 'node:fs/promises';
+import { AppModule } from '../dist/app.module.js';
 
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  app.useGlobalPipes(
-    new ValidationPipe({
-      //whitelist: true,
-      transform: true,
-      transformOptions: {
-        enableImplicitConversion: true,
-      },
-    }),
-  );
+async function generate() {
+  const app = await NestFactory.create(AppModule, { logger: false });
 
   const config = new DocumentBuilder()
     .setTitle('IntervistaServer API')
@@ -28,14 +19,14 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document, {
-    jsonDocumentUrl: 'api/json',
-    yamlDocumentUrl: 'api/yaml',
-  });
-
-  await app.listen(process.env.PORT ?? 3000);
+  await fs.writeFile('openapi.json', JSON.stringify(document, null, 2), 'utf-8');
+  console.log('Successfully generated openapi.json');
+  await app.close();
+  process.exit(0);
 }
-void bootstrap();
 
-
+generate().catch((err) => {
+  console.error('Error generating OpenAPI specification:', err);
+  process.exit(1);
+});
 

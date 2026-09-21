@@ -19,7 +19,8 @@
     "test:watch": "vitest",
     "test:cov": "vitest run --coverage",
     "test:debug": "vitest --inspect-brk --no-file-parallelism",
-    "test:e2e": "vitest run --config ./vitest.config.e2e.ts"
+    "test:e2e": "vitest run --config ./vitest.config.e2e.ts",
+    "openapi:generate": "npm run build && node scripts/generate-openapi.js"
   },
   "dependencies": {
     "@nestjs/common": "^12.0.1",
@@ -27,6 +28,7 @@
     "@nestjs/core": "^12.0.1",
     "@nestjs/mapped-types": "*",
     "@nestjs/platform-express": "^12.0.1",
+    "@nestjs/swagger": "^12.0.1",
     "@prisma/adapter-mariadb": "^7.10.0",
     "@prisma/client": "^7.10.0",
     "@types/supertest": "^7.2.1",

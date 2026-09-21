@@ -8,7 +8,12 @@ import {
   Param,
   Delete,
 } from '@nestjs/common';
-import { IntersectionType } from '@nestjs/mapped-types';
+import {
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+  IntersectionType,
+} from '@nestjs/swagger';
 import { UtenteService } from './utente.service.js';
 import { CreateUtenteDto } from './dto/create-utente.dto.js';
 import { ResponseUtenteDto } from './dto/response-utente.dto.js';
@@ -24,16 +29,23 @@ export class UtenteFindAllParamsDto extends IntersectionType(
   PaginationParamsDto,
 ) {}
 
+@ApiTags('Utenti')
 @Controller('utente')
 export class UtenteController {
   constructor(private readonly utenteService: UtenteService) {}
 
   @Post()
+  @ApiOperation({ summary: 'Create a new user (candidate or interviewer)' })
+  @ApiResponse({ status: 201, description: 'User created successfully', type: ResponseUtenteDto })
+  @ApiResponse({ status: 400, description: 'Validation failed' })
+  @ApiResponse({ status: 404, description: 'User with email already exists' })
   create(@Body() createDto: CreateUtenteDto) {
     return this.utenteService.create(createDto);
   }
 
   @Get()
+  @ApiOperation({ summary: 'Retrieve users with filters, projection, and pagination' })
+  @ApiResponse({ status: 200, description: 'List of matching users', type: [ResponseUtenteDto] })
   findAll(
     @Query() params: UtenteFindAllParamsDto,
   ) {
@@ -41,6 +53,9 @@ export class UtenteController {
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'Get a single user by ID' })
+  @ApiResponse({ status: 200, description: 'User found', type: ResponseUtenteDto })
+  @ApiResponse({ status: 404, description: 'User not found' })
   findOne(
     @Param('id') id: number,
     @Query() params: UtenteSelectParamsDto,
@@ -49,6 +64,9 @@ export class UtenteController {
   }
 
   @Patch(':id')
+  @ApiOperation({ summary: 'Update an existing user' })
+  @ApiResponse({ status: 200, description: 'User updated successfully', type: ResponseUtenteDto })
+  @ApiResponse({ status: 404, description: 'User not found' })
   update(
     @Param('id') id: number,
     @Body() update: UpdateUtenteDto,
@@ -57,6 +75,9 @@ export class UtenteController {
   }
 
   @Delete(':id')
+  @ApiOperation({ summary: 'Delete a user by ID' })
+  @ApiResponse({ status: 200, description: 'User deleted successfully', type: ResponseUtenteDto })
+  @ApiResponse({ status: 404, description: 'User not found' })
   remove(@Param('id') id: number) {
     return this.utenteService.remove(id);
   }

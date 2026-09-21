@@ -1,16 +1,4 @@
-import { PickType } from '@nestjs/mapped-types';
-import { CreateUtenteDto } from '../../utente/dto/create-utente.dto.js';
-import { Type } from 'class-transformer';
-import {
-  ArrayMinSize,
-  IsArray,
-  IsDateString,
-  IsInt,
-  IsOptional,
-  IsString,
-  Min,
-  ValidateNested,
-} from 'class-validator';
+import { ArrayMinSize, IsArray, IsInt, Min } from 'class-validator';
 import { BaseIntervistaDto } from './base-intervista.dto.js';
 
 export class CreateIntervistaDto extends BaseIntervistaDto {

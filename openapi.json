@@ -1,0 +1,1481 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/": {
+      "get": {
+        "operationId": "AppController_getHello",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Service is healthy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Health check endpoint",
+        "tags": [
+          "System"
+        ]
+      }
+    },
+    "/database": {
+      "delete": {
+        "operationId": "AppController_clearDatabase",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Database cleared"
+          }
+        },
+        "summary": "Clear all database records",
+        "tags": [
+          "System"
+        ]
+      },
+      "get": {
+        "operationId": "AppController_getDatabaseCounts",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Record counts returned"
+          }
+        },
+        "summary": "Get entity counts in database",
+        "tags": [
+          "System"
+        ]
+      }
+    },
+    "/utente": {
+      "post": {
+        "operationId": "UtenteController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUtenteDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseUtenteDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed"
+          },
+          "404": {
+            "description": "User with email already exists"
+          }
+        },
+        "summary": "Create a new user (candidate or interviewer)",
+        "tags": [
+          "Utenti"
+        ]
+      },
+      "get": {
+        "operationId": "UtenteController_findAll",
+        "parameters": [
+          {
+            "name": "exclude",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "id",
+                  "nome",
+                  "cognome",
+                  "email",
+                  "ruolo",
+                  "intervisteRicevute",
+                  "intervisteEffettuate",
+                  "selezionatoIn"
+                ]
+              }
+            }
+          },
+          {
+            "name": "fullRelations",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "id",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          },
+          {
+            "name": "nome",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "cognome",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "email",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "email"
+              }
+            }
+          },
+          {
+            "name": "ruolo",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "intervisteRicevute",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          },
+          {
+            "name": "intervisteEffettuate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          },
+          {
+            "name": "selezionatoIn",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          },
+          {
+            "name": "skip",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 0,
+              "type": "number"
+            }
+          },
+          {
+            "name": "take",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 0,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of matching users",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ResponseUtenteDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Retrieve users with filters, projection, and pagination",
+        "tags": [
+          "Utenti"
+        ]
+      }
+    },
+    "/utente/{id}": {
+      "get": {
+        "operationId": "UtenteController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "exclude",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "id",
+                  "nome",
+                  "cognome",
+                  "email",
+                  "ruolo",
+                  "intervisteRicevute",
+                  "intervisteEffettuate",
+                  "selezionatoIn"
+                ]
+              }
+            }
+          },
+          {
+            "name": "fullRelations",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseUtenteDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found"
+          }
+        },
+        "summary": "Get a single user by ID",
+        "tags": [
+          "Utenti"
+        ]
+      },
+      "patch": {
+        "operationId": "UtenteController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUtenteDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseUtenteDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found"
+          }
+        },
+        "summary": "Update an existing user",
+        "tags": [
+          "Utenti"
+        ]
+      },
+      "delete": {
+        "operationId": "UtenteController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseUtenteDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found"
+          }
+        },
+        "summary": "Delete a user by ID",
+        "tags": [
+          "Utenti"
+        ]
+      }
+    },
+    "/intervista": {
+      "post": {
+        "operationId": "IntervistaController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateIntervistaDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Interview scheduled successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseIntervistaDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed or schedule conflict detected"
+          },
+          "404": {
+            "description": "Candidate, interviewer, or ricerca not found"
+          }
+        },
+        "summary": "Schedule a new interview with collision detection",
+        "tags": [
+          "Interviste"
+        ]
+      },
+      "get": {
+        "operationId": "IntervistaController_findAll",
+        "parameters": [
+          {
+            "name": "exclude",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "id",
+                  "inizio",
+                  "fine",
+                  "stato",
+                  "candidato",
+                  "intervistatori",
+                  "ricerca"
+                ]
+              }
+            }
+          },
+          {
+            "name": "fullRelations",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "id",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          },
+          {
+            "name": "before",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          {
+            "name": "after",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          {
+            "name": "stato",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "candidato",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          },
+          {
+            "name": "intervistatori",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          },
+          {
+            "name": "ricerca",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          },
+          {
+            "name": "skip",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 0,
+              "type": "number"
+            }
+          },
+          {
+            "name": "take",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 0,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of matching interviews",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ResponseIntervistaDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Retrieve interviews with filters, date ranges, and pagination",
+        "tags": [
+          "Interviste"
+        ]
+      }
+    },
+    "/intervista/{id}": {
+      "get": {
+        "operationId": "IntervistaController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "exclude",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "id",
+                  "inizio",
+                  "fine",
+                  "stato",
+                  "candidato",
+                  "intervistatori",
+                  "ricerca"
+                ]
+              }
+            }
+          },
+          {
+            "name": "fullRelations",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Interview found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseIntervistaDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Interview not found"
+          }
+        },
+        "summary": "Get a single interview by ID",
+        "tags": [
+          "Interviste"
+        ]
+      },
+      "patch": {
+        "operationId": "IntervistaController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateIntervistaDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Interview updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseIntervistaDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Schedule conflict or validation error"
+          },
+          "404": {
+            "description": "Interview or referenced entity not found"
+          }
+        },
+        "summary": "Update an interview (re-validates schedule conflicts)",
+        "tags": [
+          "Interviste"
+        ]
+      },
+      "delete": {
+        "operationId": "IntervistaController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Interview deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseIntervistaDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Interview not found"
+          }
+        },
+        "summary": "Cancel/delete an interview by ID",
+        "tags": [
+          "Interviste"
+        ]
+      }
+    },
+    "/intervista/{id}/intervistatori": {
+      "post": {
+        "operationId": "IntervistaController_addIntervistatore",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UtenteIdDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Interviewer added successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseIntervistaDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Interviewer is already busy during interview time"
+          },
+          "404": {
+            "description": "Interview or user not found"
+          }
+        },
+        "summary": "Add an interviewer to an interview",
+        "tags": [
+          "Interviste"
+        ]
+      }
+    },
+    "/intervista/{id}/intervistatori/{utenteId}": {
+      "delete": {
+        "operationId": "IntervistaController_removeIntervistatore",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "utenteId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Interviewer removed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseIntervistaDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Cannot remove if zero interviewers would remain"
+          },
+          "404": {
+            "description": "Interview not found or user is not an interviewer"
+          }
+        },
+        "summary": "Remove an interviewer from an interview",
+        "tags": [
+          "Interviste"
+        ]
+      }
+    },
+    "/ricerca": {
+      "post": {
+        "operationId": "RicercaController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRicercaDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Ricerca created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseRicercaDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed"
+          }
+        },
+        "summary": "Create a new recruitment campaign",
+        "tags": [
+          "Ricerche"
+        ]
+      },
+      "get": {
+        "operationId": "RicercaController_findAll",
+        "parameters": [
+          {
+            "name": "exclude",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "id",
+                  "stato",
+                  "descrizione",
+                  "interviste",
+                  "selezionati"
+                ]
+              }
+            }
+          },
+          {
+            "name": "fullRelations",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "id",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          },
+          {
+            "name": "stato",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "interviste",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          },
+          {
+            "name": "selezionati",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          },
+          {
+            "name": "skip",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 0,
+              "type": "number"
+            }
+          },
+          {
+            "name": "take",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 0,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of matching ricerche",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ResponseRicercaDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Retrieve recruitment campaigns with filters and pagination",
+        "tags": [
+          "Ricerche"
+        ]
+      }
+    },
+    "/ricerca/{id}": {
+      "get": {
+        "operationId": "RicercaController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "exclude",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "id",
+                  "stato",
+                  "descrizione",
+                  "interviste",
+                  "selezionati"
+                ]
+              }
+            }
+          },
+          {
+            "name": "fullRelations",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ricerca found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseRicercaDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Ricerca not found"
+          }
+        },
+        "summary": "Get a single recruitment campaign by ID",
+        "tags": [
+          "Ricerche"
+        ]
+      },
+      "patch": {
+        "operationId": "RicercaController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateRicercaDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ricerca updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseRicercaDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Ricerca not found"
+          }
+        },
+        "summary": "Update a recruitment campaign",
+        "tags": [
+          "Ricerche"
+        ]
+      },
+      "delete": {
+        "operationId": "RicercaController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ricerca deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseRicercaDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Ricerca not found"
+          }
+        },
+        "summary": "Delete a recruitment campaign by ID",
+        "tags": [
+          "Ricerche"
+        ]
+      }
+    },
+    "/ricerca/{id}/selezionato": {
+      "post": {
+        "operationId": "RicercaController_addSelezionato",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UtenteIdDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Candidate added to selection",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseRicercaDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Ricerca or user not found"
+          }
+        },
+        "summary": "Add a selected candidate to this recruitment campaign",
+        "tags": [
+          "Ricerche"
+        ]
+      }
+    },
+    "/ricerca/{id}/selezionato/{utenteId}": {
+      "delete": {
+        "operationId": "RicercaController_removeSelezionato",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "utenteId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Candidate removed from selection",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseRicercaDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Ricerca or user not found or not selected"
+          }
+        },
+        "summary": "Remove a candidate from the selection",
+        "tags": [
+          "Ricerche"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "IntervistaServer API",
+    "description": "API specification for IntervistaServer: candidate management, recruitment searches, and conflict-validated interview scheduling.",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [
+    {
+      "name": "Utenti",
+      "description": "Operations with users, candidates, and interviewers"
+    },
+    {
+      "name": "Ricerche",
+      "description": "Recruitment campaigns and selected candidate assignments"
+    },
+    {
+      "name": "Interviste",
+      "description": "Interview scheduling with schedule collision detection"
+    },
+    {
+      "name": "System",
+      "description": "Health and database maintenance utilities"
+    }
+  ],
+  "servers": [],
+  "components": {
+    "schemas": {
+      "CreateUtenteDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "nome": {
+            "type": "string"
+          },
+          "cognome": {
+            "type": "string"
+          },
+          "ruolo": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "nome",
+          "cognome"
+        ]
+      },
+      "ResponseUtenteDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "intervisteRicevute": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "intervisteEffettuate": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "selezionatoIn": {
+            "type": "object"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "nome": {
+            "type": "string"
+          },
+          "cognome": {
+            "type": "string"
+          },
+          "ruolo": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "intervisteRicevute",
+          "intervisteEffettuate",
+          "email",
+          "nome",
+          "cognome"
+        ]
+      },
+      "UpdateUtenteDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "nome": {
+            "type": "string"
+          },
+          "cognome": {
+            "type": "string"
+          },
+          "ruolo": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateIntervistaDto": {
+        "type": "object",
+        "properties": {
+          "candidato": {
+            "type": "number",
+            "minimum": 0
+          },
+          "intervistatori": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "number",
+              "minimum": 0
+            }
+          },
+          "ricerca": {
+            "type": "number",
+            "minimum": 0
+          },
+          "stato": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          },
+          "inizio": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "fine": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "candidato",
+          "intervistatori",
+          "ricerca",
+          "inizio",
+          "fine"
+        ]
+      },
+      "ResponseIntervistaDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "candidato": {
+            "type": "object"
+          },
+          "intervistatori": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "ricerca": {
+            "type": "object"
+          },
+          "stato": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          },
+          "inizio": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "fine": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "candidato",
+          "intervistatori",
+          "ricerca",
+          "inizio",
+          "fine"
+        ]
+      },
+      "UpdateIntervistaDto": {
+        "type": "object",
+        "properties": {
+          "stato": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          },
+          "inizio": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "fine": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "candidato": {
+            "type": "number",
+            "minimum": 0
+          },
+          "intervistatori": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "number",
+              "minimum": 0
+            }
+          },
+          "ricerca": {
+            "type": "number",
+            "minimum": 0
+          }
+        }
+      },
+      "UtenteIdDto": {
+        "type": "object",
+        "properties": {
+          "utenteId": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "utenteId"
+        ]
+      },
+      "CreateRicercaDto": {
+        "type": "object",
+        "properties": {
+          "descrizione": {
+            "type": "string"
+          },
+          "stato": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "descrizione"
+        ]
+      },
+      "ResponseRicercaDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "interviste": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "selezionati": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "descrizione": {
+            "type": "string"
+          },
+          "stato": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "interviste",
+          "selezionati",
+          "descrizione"
+        ]
+      },
+      "UpdateRicercaDto": {
+        "type": "object",
+        "properties": {
+          "descrizione": {
+            "type": "string"
+          },
+          "stato": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
