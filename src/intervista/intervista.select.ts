@@ -4,6 +4,7 @@ import { Prisma } from '../generated/prisma/client.js';
 export const intervistaSelect = {
   id: true,
   stato: true,
+  note: true,
   inizio: true,
   fine: true,
   candidato: {

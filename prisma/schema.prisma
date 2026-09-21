@@ -31,6 +31,7 @@ model Intervista {
   inizio         DateTime
   fine           DateTime
   stato          String   @default("programmata")
+  note           String?
   candidatoId    Int
   candidato      Utente   @relation(fields: [candidatoId], references: [id])
   intervistatori Utente[] @relation("IntervisteEffettuate")

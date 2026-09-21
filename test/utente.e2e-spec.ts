@@ -1,9 +1,8 @@
-import { INestApplication, ValidationPipe } from '@nestjs/common';
-import { Test, TestingModule } from '@nestjs/testing';
+import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { App } from 'supertest/types';
-import { AppModule } from '../src/app.module.js';
 import { PrismaService } from '../src/prisma.service.js';
+import { createE2eApp } from './e2e-app.js';
 
 describe('UtenteController (e2e)', () => {
   let app: INestApplication<App>;
@@ -11,19 +10,7 @@ describe('UtenteController (e2e)', () => {
   const email = `utente-e2e-${Date.now()}@example.com`;
 
   beforeAll(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-
-    app = moduleFixture.createNestApplication();
-    app.useGlobalPipes(
-      new ValidationPipe({
-        transform: true,
-        transformOptions: { enableImplicitConversion: true },
-      }),
-    );
-    prisma = app.get(PrismaService);
-    await app.init();
+    ({ app, prisma } = await createE2eApp());
   });
 
   afterAll(async () => {

@@ -5,6 +5,10 @@ export class BaseIntervistaDto {
   @IsString()
   stato?: string;
 
+  @IsOptional()
+  @IsString()
+  note?: string;
+
   @IsDate()
   inizio!: Date;
 

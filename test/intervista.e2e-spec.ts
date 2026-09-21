@@ -1,9 +1,8 @@
-import { INestApplication, ValidationPipe } from '@nestjs/common';
-import { Test, TestingModule } from '@nestjs/testing';
+import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { App } from 'supertest/types';
-import { AppModule } from '../src/app.module.js';
 import { PrismaService } from '../src/prisma.service.js';
+import { createE2eApp } from './e2e-app.js';
 
 describe('IntervistaController (e2e)', () => {
   let app: INestApplication<App>;
@@ -21,19 +20,7 @@ describe('IntervistaController (e2e)', () => {
   let errorRicercaId: number;
 
   beforeAll(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-
-    app = moduleFixture.createNestApplication();
-    app.useGlobalPipes(
-      new ValidationPipe({
-        transform: true,
-        transformOptions: { enableImplicitConversion: true },
-      }),
-    );
-    prisma = app.get(PrismaService);
-    await app.init();
+    ({ app, prisma } = await createE2eApp());
 
     const candidatoResponse = await request(app.getHttpServer())
       .post('/utente')
@@ -134,6 +121,7 @@ describe('IntervistaController (e2e)', () => {
         inizio,
         fine,
         stato: 'programmata',
+        note: 'Initial technical interview',
         candidato: candidatoId,
         intervistatori: [intervistatoreId],
         ricerca: ricercaId,
@@ -142,6 +130,7 @@ describe('IntervistaController (e2e)', () => {
 
     expect(createResponse.body).toMatchObject({
       stato: 'programmata',
+      note: 'Initial technical interview',
       candidato: candidatoId,
       intervistatori: [intervistatoreId],
       ricerca: ricercaId,

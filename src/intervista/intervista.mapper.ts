@@ -28,8 +28,11 @@ export class IntervistaMapper {
   modelToDto(
     intervista: DeepPartial<IntervistaFull>,
   ): DeepPartial<ResponseIntervistaDto> {
-    const { candidato, intervistatori, ricerca, ...rest } = intervista;
-    return rest;
+    const { candidato, intervistatori, ricerca, note, ...rest } = intervista;
+    return {
+      ...rest,
+      ...note && { note },
+    };
   }
 
   /**
